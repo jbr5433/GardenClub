@@ -27,18 +27,9 @@ public class CustomListView extends ArrayAdapter{
     public CustomListView(Activity context, String[] names, Integer[] imgid) {
         super(context, R.layout.list_view_contacts_template, names);
 
-
-
         this.context = context;
         this.names = names;
         this.imgid = imgid;
-
-
-
-
-
-
-
     }
 
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent){
@@ -47,9 +38,8 @@ public class CustomListView extends ArrayAdapter{
         if(r == null)
         {
             LayoutInflater layoutInflater = context.getLayoutInflater();
-            r=layoutInflater.inflate(R.layout.list_view_contacts_template, null, true);
+            r = layoutInflater.inflate(R.layout.list_view_contacts_template, null, true);
             viewHolder = new ViewHolder(r);
-
 
             r.setTag(viewHolder);
 

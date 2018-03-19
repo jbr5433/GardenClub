@@ -12,26 +12,21 @@ public class Contact extends AppCompatActivity {
     TextView emailID;
 
 
+    /////////////////////////////////////////////////////////////////////////
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
 
-
         sendEmail = (Button) findViewById(R.id.button6);
         emailID = (TextView)findViewById(R.id.textView15);
-
-
 
         sendEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-
-
                 String email = String.valueOf(emailID.getText());
-
-
 
                 Intent emailIntent = new Intent(Intent.ACTION_SEND);
                 emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
