@@ -5,12 +5,21 @@ package com.example.lenovo.gardenclub;
  */
 
 public class Contacts {
-    private String name, email, mobile;
+    private String name, email, mobile, mbrStatus;
 
-    public Contacts (String name, String email, String mobile) {
+    public Contacts (String name, String email, String mobile, String mbrStatus) {
         this.setName(name);
         this.setEmail(email);
         this.setMobile(mobile);
+        this.setMbrStatus(mbrStatus);
+    }
+
+    public String getMbrStatus() {
+        return mbrStatus;
+    }
+
+    public void setMbrStatus(String mbrStatus) {
+        this.mbrStatus = mbrStatus;
     }
 
     public String getName() {

@@ -47,11 +47,12 @@ public class ContactAdapter extends ArrayAdapter{
         ContactHolder contactHolder;
         if(row == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            row = layoutInflater.inflate(R.layout.row_layout, parent, false);
+            row = layoutInflater.inflate(R.layout.row_layout_1, parent, false);
             contactHolder = new ContactHolder();
-            contactHolder.tx_name = row.findViewById(R.id.tx_name);
+            contactHolder.tx_name = row.findViewById(R.id.tv_name);
             contactHolder.tx_email = row.findViewById(R.id.tx_email);
             contactHolder.tx_mobile = row.findViewById(R.id.tx_mobile);
+            contactHolder.tx_mbrstatus = row.findViewById(R.id.tv_mbrstatus);
             row.setTag(contactHolder);
 
         } else {
@@ -59,13 +60,14 @@ public class ContactAdapter extends ArrayAdapter{
         }
         Contacts contact = (Contacts) this.getItem(position);
         contactHolder.tx_name.setText(contact.getName());
-        contactHolder.tx_email.setText(contact.getEmail());
-        contactHolder.tx_mobile.setText(contact.getMobile());
+//        contactHolder.tx_email.setText(contact.getEmail());
+//        contactHolder.tx_mobile.setText(contact.getMobile());
+        contactHolder.tx_mbrstatus.setText(contact.getMbrStatus());
         return row;
     }
 
     static class ContactHolder {
-        TextView tx_name, tx_email, tx_mobile;
+        TextView tx_name, tx_email, tx_mobile, tx_mbrstatus;
 
     }
 }
