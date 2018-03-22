@@ -1,17 +1,29 @@
 package com.example.lenovo.gardenclub;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import static com.example.lenovo.gardenclub.MainActivity.JSON_STRING;
 
 
 public class ContactList extends AppCompatActivity{
@@ -55,7 +67,6 @@ public class ContactList extends AppCompatActivity{
                 mContactAdapter.add(contact);
 
                 count++;
-
             }
 
         } catch (JSONException e) {
@@ -66,15 +77,72 @@ public class ContactList extends AppCompatActivity{
         lst.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.d(TAG, "i: " + i);
-                Log.d(TAG, "view: " + view.getId());
-                Log.d(TAG, "l: " + l);
-                Toast.makeText(getApplicationContext(), String.valueOf(findViewById(R.id.tv_name)), Toast.LENGTH_SHORT).show();
+                try {
+                    Toast.makeText(getApplicationContext(), String.valueOf(mJSONArray.getJSONObject(i)), Toast.LENGTH_SHORT).show();
+                    String json = mJSONArray.getJSONObject(i).toString();
+                    intent.putExtra("json_object", json);
+                    startActivity(intent);
 
-                //    intent.putExtra("json_data", json_string);
-                //startActivity(intent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+
+
             }
         });
 
     }
+
+    class BackgroundTask extends AsyncTask<Void,Void,String> {
+        String json_url;
+        private static final String TAG = "BackgroundTask";
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            try {
+                URL url = new URL(json_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((JSON_STRING = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(JSON_STRING+"\n");
+                }
+
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return stringBuilder.toString().trim();
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            json_url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/get_json_data.php";
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            TextView textView = findViewById(R.id.textView);
+            textView.setText(result);
+//            Log.d(TAG, "onPostExecute: s = " + s);
+            json_string = result;
+
+        }
+    }
+
 }

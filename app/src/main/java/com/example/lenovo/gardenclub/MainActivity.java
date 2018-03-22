@@ -27,7 +27,8 @@ import java.net.URLEncoder;
 public class MainActivity extends AppCompatActivity {
     EditText UsernameEt, PasswordEt;
     Button Login;
-    String JSON_STRING, json_string;
+    static String JSON_STRING;
+    static String json_string;
 
 
     @Override
@@ -81,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
                 StringBuilder stringBuilder = new StringBuilder();
                 while ((JSON_STRING = bufferedReader.readLine()) != null) {
                     stringBuilder.append(JSON_STRING+"\n");
-
                 }
 
                 bufferedReader.close();
