@@ -49,6 +49,8 @@ public class ContactList extends AppCompatActivity{
 
         json_string = getIntent().getExtras().getString("json_data");
         try {
+
+
             mJSONObject = new JSONObject(json_string);
             mJSONArray = mJSONObject.getJSONArray("server_response");
 
