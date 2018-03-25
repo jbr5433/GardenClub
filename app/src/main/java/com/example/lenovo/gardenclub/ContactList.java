@@ -26,6 +26,8 @@ import java.net.URL;
 import static com.example.lenovo.gardenclub.MainActivity.JSON_STRING;
 
 
+
+
 public class ContactList extends AppCompatActivity{
     private static final String TAG = "ContactList";
     String json_string;
@@ -48,8 +50,8 @@ public class ContactList extends AppCompatActivity{
         JSONObject JO;
 
         json_string = getIntent().getExtras().getString("json_data");
+        Log.d(TAG, "onCreate: json_string from intent: " + json_string);
         try {
-
 
             mJSONObject = new JSONObject(json_string);
             mJSONArray = mJSONObject.getJSONArray("server_response");
@@ -95,56 +97,6 @@ public class ContactList extends AppCompatActivity{
             }
         });
 
-    }
-
-    class BackgroundTask extends AsyncTask<Void,Void,String> {
-        String json_url;
-        private static final String TAG = "BackgroundTask";
-
-        @Override
-        protected String doInBackground(Void... voids) {
-            try {
-                URL url = new URL(json_url);
-                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-                InputStream inputStream = httpURLConnection.getInputStream();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
-                StringBuilder stringBuilder = new StringBuilder();
-                while ((JSON_STRING = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(JSON_STRING+"\n");
-                }
-
-                bufferedReader.close();
-                inputStream.close();
-                httpURLConnection.disconnect();
-                return stringBuilder.toString().trim();
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            json_url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/get_json_data.php";
-
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            TextView textView = findViewById(R.id.textView);
-            textView.setText(result);
-//            Log.d(TAG, "onPostExecute: s = " + s);
-            json_string = result;
-
-        }
     }
 
 }

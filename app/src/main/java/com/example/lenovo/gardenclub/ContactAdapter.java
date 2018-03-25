@@ -49,7 +49,7 @@ public class ContactAdapter extends ArrayAdapter{
             LayoutInflater layoutInflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             row = layoutInflater.inflate(R.layout.row_layout_1, parent, false);
             contactHolder = new ContactHolder();
-            contactHolder.tx_name = row.findViewById(R.id.tv_name);
+            contactHolder.tx_name = row.findViewById(R.id.nameTV);
             contactHolder.tx_email = row.findViewById(R.id.tx_email);
             contactHolder.tx_mobile = row.findViewById(R.id.tx_mobile);
             contactHolder.tx_mbrstatus = row.findViewById(R.id.tv_mbrstatus);
