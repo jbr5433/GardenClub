@@ -1,7 +1,11 @@
 package com.example.lenovo.gardenclub;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +17,6 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,18 +29,21 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.concurrent.ExecutionException;
 
 public class Contact extends AppCompatActivity {
-    Button sendEmail;
+    Button btnEmail, btnCall, btnText;
     TextView emailID;
     JSONObject jsonObject;
     String json, JSON_STRING, json_string, type, userID;
     private static final String TAG = "Contact";
+    String finalEmail = null;
+    JSONObject JO;
+    String SBString;
+
 
     public Contact() throws JSONException {
     }
-
-    /////////////////////////////////////////////////////////////////////////
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,36 +53,17 @@ public class Contact extends AppCompatActivity {
         intent.getExtras();
         setContentView(R.layout.activity_contact);
         json = getIntent().getExtras().getString("json_object");
+        getSupportActionBar().hide();
 
         try {
             jsonObject = new JSONObject(json);
 
-            Toast.makeText(getApplicationContext(), jsonObject.getString("userID"), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getApplicationContext(), jsonObject.getString("userID"), Toast.LENGTH_SHORT).show();
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        sendEmail = (Button) findViewById(R.id.button6);
-//        emailID = (TextView)findViewById(R.id.textView15);
 
-        sendEmail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String email = String.valueOf(emailID.getText());
-
-                Intent emailIntent = new Intent(Intent.ACTION_SEND);
-                emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
-//                emailIntent.putExtra(Intent.EXTRA_CC, new String[]{"swanandinaction@gmail.com"});
-//                emailIntent.putExtra(Intent.EXTRA_BCC, new String[]{"swanandinaction@gmail.com"});
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject: ");
-                emailIntent.putExtra(Intent.EXTRA_TEXT, "Body: ");
-
-                emailIntent.setType("message/rfc822");
-                startActivity(Intent.createChooser(emailIntent, "Choose email client... "));
-
-            }
-        });
         try {
             userID = jsonObject.getString("userID");
             new BackgroundTask1().execute("get_info", userID);
@@ -89,9 +76,10 @@ public class Contact extends AppCompatActivity {
     public void getJSON(View view) {
         new BackgroundTask1().execute();
         parseJson(view);
+
     }
 
-    class BackgroundTask1 extends AsyncTask<String,Void,String> {
+    class BackgroundTask1 extends AsyncTask<String, Void, String> {
         String json_post, json_get;
         private static final String TAG = "BackgroundTask";
 
@@ -101,14 +89,14 @@ public class Contact extends AppCompatActivity {
             Log.d(TAG, "doInBackground: starts");
             type = params[0];
             StringBuilder stringBuilder = null;
-            Log.d(TAG, "doInBackground: type: "+type);
+            Log.d(TAG, "doInBackground: type: " + type);
             if (type.equals("post_info")) {
                 try {
                     Log.d(TAG, "doInBackground: type equals post_info");
                     userID = params[1];
 //                String password = params[2];
                     URL url = new URL(json_get);
-                    HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
                     httpURLConnection.setRequestMethod("POST");
                     httpURLConnection.setDoOutput(true);
@@ -117,13 +105,13 @@ public class Contact extends AppCompatActivity {
                     BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
                     //CHANGE THIS: FirstName and LastName
                     userID = jsonObject.getString("UserID");
-                    String post_data = URLEncoder.encode("UserID","UTF-8")+"="+URLEncoder.encode(userID,"UTF-8");
+                    String post_data = URLEncoder.encode("UserID", "UTF-8") + "=" + URLEncoder.encode(userID, "UTF-8");
                     bufferedWriter.write(post_data);
                     bufferedWriter.flush();
                     bufferedWriter.close();
                     outputStream.close();
                     InputStream inputStream = httpURLConnection.getInputStream();
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "iso-8859-1"));
 //                    String result="";
 //                    String line="";
 //                    while((line = bufferedReader.readLine())!= null) {
@@ -135,7 +123,7 @@ public class Contact extends AppCompatActivity {
 //                writeToFile(inputStream, getApplicationContext());
                     stringBuilder = new StringBuilder();
                     while ((JSON_STRING = bufferedReader.readLine()) != null) {
-                        stringBuilder.append(JSON_STRING+"\n");
+                        stringBuilder.append(JSON_STRING + "\n");
                         Log.d(TAG, "doInBackground: JSON_STRING: " + JSON_STRING);
                     }
 
@@ -160,24 +148,35 @@ public class Contact extends AppCompatActivity {
                 try {
 //                String password = params[2];
                     URL url = new URL(json_get);
-                    HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                     InputStream inputStream = httpURLConnection.getInputStream();
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "iso-8859-1"));
 //                writeToFile(inputStream, getApplicationContext());
                     stringBuilder = new StringBuilder();
                     while ((JSON_STRING = bufferedReader.readLine()) != null) {
-                        stringBuilder.append(JSON_STRING+"\n");
+                        stringBuilder.append(JSON_STRING + "\n");
 //                        Log.d(TAG, "doInBackground: JSON_STRING: " + JSON_STRING["server_response"]);
                     }
-                    JSONObject JO;
-                    Log.d(TAG, "doInBackground: JG: " + stringBuilder);
+
                     JSONObject jsonObject = new JSONObject(String.valueOf(stringBuilder));
                     JSONArray jsonArray = jsonObject.getJSONArray("server_response");
 
-                    String email, mbrStatus, photoID, yearTurnedActive, firstName, lastName, spouse, SreetAddress, City, State;
+                    String email;
+                    String mbrStatus;
+                    String photoID;
+                    String yearTurnedActive;
+                    String firstName;
+                    String lastName;
+                    String spouse;
+                    String SreetAddress;
+                    String City;
+                    String State;
                     String ZipCode, PrimaryContactNumber, SecondaryContactNumber, TypeofPrimaryContactNo, TypeofSecondaryContactNo, Office, OfficerTitle, ExecutiveBdMbrship;
                     String CurrentCmteAssignment1, CmteAssign1Chair, CmteAssign1CoChair, CurrentCmteAssignment2, CmteAssign2Chair, CmteAssign2CoChair;
-                    String CurrentCmteAssignment3, CmteAssign3Chair, CmteAssign3CoChair, BiographicalInfo;
+                    String CurrentCmteAssignment3;
+                    String CmteAssign3Chair;
+                    String CmteAssign3CoChair;
+                    String BiographicalInfo;
                     Log.d(TAG, "doInBackground: userID::: " + userID);
 
                     final TextView nameTV = (TextView) findViewById(R.id.nameTV);
@@ -225,7 +224,6 @@ public class Contact extends AppCompatActivity {
                             CmteAssign3CoChair = jsonArray.getJSONObject(i).getString("CmteAssign3CoChair");
                             BiographicalInfo = jsonArray.getJSONObject(i).getString("BiographicalInfo");
 
-                            Log.d(TAG, "doInBackground: stufdf: " + firstName + lastName + mbrStatus);
                             final String finalFirstName = firstName;
                             final String finalLastName = lastName;
                             final String finalMbrStatus = mbrStatus;
@@ -238,19 +236,92 @@ public class Contact extends AppCompatActivity {
                             final String finalSecondaryContactNumber = SecondaryContactNumber;
                             final String finalEmail = email;
                             final String finalBiographicalInfo = BiographicalInfo;
+
+                            final String finalYearTurnedActive = yearTurnedActive;
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     nameTV.setText(finalFirstName.concat(" " + finalLastName));
                                     mbrStatusTV.setText(finalMbrStatus);
                                     spouseTV.setText(finalSpouse);
-                                    addressTV.setText(finalSreetAddress.concat(", " + finalCity + ", " + finalState + " " + finalZipCode));
+                                    addressTV.setText(finalSreetAddress.concat(",\n" + finalCity + ", " + finalState + " " + finalZipCode));
                                     primaryContactTV.setText(finalPrimaryContactNumber);
                                     secondaryContactTV.setText(finalSecondaryContactNumber);
                                     emailTV.setText(finalEmail);
+
+                                    btnEmail = (Button) findViewById(R.id.btn_email);
+                                    btnCall = (Button) findViewById(R.id.btn_call);
+                                    btnText = (Button) findViewById(R.id.btn_text);
+
+                                    TextView tvMoreInfo = (TextView) findViewById(R.id.tv_more_info);
+                                    tvMoreInfo.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            Intent moreInfoIntent = new Intent(getApplicationContext(), MoreInfo.class);
+                                            moreInfoIntent.putExtra("bio", finalBiographicalInfo);
+                                            moreInfoIntent.putExtra("YTA", finalYearTurnedActive);
+                                            startActivity(moreInfoIntent);
+                                            
+                                        }
+                                    });
+
+                                    btnCall.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            Intent callIntent = new Intent(Intent.ACTION_CALL);
+                                            callIntent.setData(Uri.parse("tel: " + finalPrimaryContactNumber));
+                                            if (ActivityCompat.checkSelfPermission(Contact.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                                                // TODO: Consider calling
+                                                //    ActivityCompat#requestPermissions
+                                                // here to request the missing permissions, and then overriding
+                                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                                //                                          int[] grantResults)
+                                                // to handle the case where the user grants the permission. See the documentation
+                                                // for ActivityCompat#requestPermissions for more details.
+                                                Intent intent = new Intent(Intent.ACTION_DIAL);
+                                                intent.setData(Uri.parse("tel: " + finalPrimaryContactNumber));
+                                                startActivity(intent);
+                                                return;
+                                            }
+                                            startActivity(callIntent);
+                                        }
+                                    });
+
+                                    btnEmail.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+
+//                String email = String.valueOf(emailID.getText());
+
+                                            Log.d(TAG, "onClick: finalEmail: " + finalEmail);
+
+                                            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+                                            emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{finalEmail});
+//                                            emailIntent.putExtra(Intent.EXTRA_CC, new String[]{"swanandinaction@gmail.com"});
+//                                            emailIntent.putExtra(Intent.EXTRA_BCC, new String[]{"swanandinaction@gmail.com"});
+                                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject: ");
+                                            emailIntent.putExtra(Intent.EXTRA_TEXT, "Body: ");
+
+                                            emailIntent.setType("message/rfc822");
+                                            startActivity(Intent.createChooser(emailIntent, "Choose email client... "));
+
+                                        }
+                                    });
+
+                                    btnText.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            Log.d(TAG, "onClick: clicked ae");
+                                            Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+                                            sendIntent.setData(Uri.parse("sms: " + finalPrimaryContactNumber));
+                                            startActivity(sendIntent);
+                                        }
+                                    });
                                 }
                             });
-
+                            Intent intent = new Intent(String.valueOf(this));
+                            intent.putExtra("json_data", json_string);
+                            Log.d(TAG, "doInBackground: json_data lmao: " + json_string);
                         }
                     }
 
@@ -271,7 +342,8 @@ public class Contact extends AppCompatActivity {
                     bufferedReader.close();
                     inputStream.close();
                     httpURLConnection.disconnect();
-                    return stringBuilder.toString().trim();
+                    SBString = stringBuilder.toString().trim();
+                    return SBString;
 
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
@@ -300,12 +372,25 @@ public class Contact extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
+
 //            TextView textView = findViewById(R.id.textView);
 //            textView.setText(result);
 //            Log.d(TAG, "onPostExecute: s = " + s);
             json_string = result;
 //            Log.d(TAG, "onPostExecute: json_string: " + json_string.toString());
 //            writeToFile(json_string);
+            JSONObject jsonObject = null;
+            Log.d(TAG, "onPostExecute: result:: " + result);
+
+
+            try {
+                jsonObject = new JSONObject(String.valueOf(SBString));
+                JSONArray jsonArray = jsonObject.getJSONArray("server_response");
+                String sssss = jsonObject.getString("userID");
+                Log.d(TAG, "onPostExecute: :::::" + sssss);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
         }
     }

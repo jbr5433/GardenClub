@@ -1,13 +1,13 @@
 <resources>
     <string name="app_name">Garden Club</string>
-    <string name="Login">Login</string>
+    <string name="Login">Submit</string>
     <string name="Clear">Clear</string>
     <string name="LoginID">LoginID</string>
     <string name="Password">Password</string>
     <string name="Description">Description Holder</string>
     <string name="Name">Name Holder</string>
     <string name="MemberStatus">Member Status</string>
-    <string name="SprouseName">Sprouse Name</string>
+    <string name="SprouseName">Spouse Name</string>
     <string name="Address">Address</string>
     <string name="PrimaryContact">Primary Contact</string>
     <string name="SecondaryContact">Secondary Contact</string>
@@ -17,11 +17,7 @@
 
     <string name="PlaceHolder">Place Holder</string>
 
-
-
-
     <string name="PrefToTreat">
-
 
         <item>Massage</item>
         <item>Acupuncture</item>
@@ -42,5 +38,10 @@
 
     </string>
     <string name="member_status">Member Status</string>
+    <string name="more_info">More Info</string>
+    <string name="back">Back</string>
+    <string name="bio_info">Biographical Info</string>
+    <string name="year_active">Year Turned Active</string>
+    <string name="dyk">Did You Know?</string>
 
 </resources>

@@ -124,8 +124,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            TextView textView = findViewById(R.id.textView);
-            textView.setText(result);
+//            TextView textView = findViewById(R.id.textView);
+//            textView.setText(result);
 //            Log.d(TAG, "onPostExecute: s = " + s);
             json_string = result;
             Log.d(TAG, "onPostExecute: json_string: " + json_string.toString());

@@ -22,6 +22,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import static com.example.lenovo.gardenclub.MainActivity.JSON_STRING;
 
@@ -46,6 +50,7 @@ public class ContactList extends AppCompatActivity{
         mContactAdapter = new ContactAdapter(this, R.layout.row_layout);
         lst = findViewById(R.id.ListView);
 //        CustomListView customListView = new CustomListView(this, names, imgid);
+
         lst.setAdapter(mContactAdapter);
         JSONObject JO;
 
@@ -55,7 +60,6 @@ public class ContactList extends AppCompatActivity{
 
             mJSONObject = new JSONObject(json_string);
             mJSONArray = mJSONObject.getJSONArray("server_response");
-
             int count = 0;
             String name, email, mobile, mbrStatus;
 
@@ -98,5 +102,9 @@ public class ContactList extends AppCompatActivity{
         });
 
     }
+
+
+
+
 
 }
