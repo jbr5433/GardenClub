@@ -70,7 +70,6 @@ public class Contact extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
     public void getJSON(View view) {
@@ -192,9 +191,7 @@ public class Contact extends AppCompatActivity {
 
                         if (jsonArray.getJSONObject(i).getString("userID").equals(userID)) {
                             //////////////////////////////////////////////////it works
-                            Log.d(TAG, "doInBackground: does it work?" + jsonArray.getJSONObject(i));
                             email = jsonArray.getJSONObject(i).getString("email");
-                            Log.d(TAG, "doInBackground: email: " + jsonArray.getJSONObject(i).getString("email"));
                             mbrStatus = jsonArray.getJSONObject(i).getString("mbrStatus");
                             userID = jsonArray.getJSONObject(i).getString("userID");
                             photoID = jsonArray.getJSONObject(i).getString("photoID");
@@ -254,6 +251,8 @@ public class Contact extends AppCompatActivity {
                                     btnText = (Button) findViewById(R.id.btn_text);
 
                                     TextView tvMoreInfo = (TextView) findViewById(R.id.tv_more_info);
+                                    TextView tvBack = (TextView) findViewById(R.id.tv_back);
+
                                     tvMoreInfo.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
@@ -262,6 +261,13 @@ public class Contact extends AppCompatActivity {
                                             moreInfoIntent.putExtra("YTA", finalYearTurnedActive);
                                             startActivity(moreInfoIntent);
                                             
+                                        }
+                                    });
+
+                                    tvBack.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            onBackPressed();
                                         }
                                     });
 

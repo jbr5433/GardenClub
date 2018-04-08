@@ -14,6 +14,7 @@
     <string name="Email">Email</string>
     <string name="Text">Text</string>
     <string name="Call">Call</string>
+    <string name="search_hint">Search the directory</string>
 
     <string name="PlaceHolder">Place Holder</string>
 

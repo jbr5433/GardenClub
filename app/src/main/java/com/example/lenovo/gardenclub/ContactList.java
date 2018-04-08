@@ -1,13 +1,16 @@
 package com.example.lenovo.gardenclub;
 
+import android.app.SearchManager;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +41,7 @@ public class ContactList extends AppCompatActivity{
     JSONObject mJSONObject;
     JSONArray mJSONArray;
     ContactAdapter mContactAdapter;
+//    SearchView mSearchView = (SearchView) findViewById(R.id.searchView);
 
     ListView lst;
 //    String[] names = {"A", "B","C","D","E","F"};
@@ -47,12 +51,15 @@ public class ContactList extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
+        getSupportActionBar().hide();
+
+        JSONObject JO;
         mContactAdapter = new ContactAdapter(this, R.layout.row_layout);
         lst = findViewById(R.id.ListView);
 //        CustomListView customListView = new CustomListView(this, names, imgid);
 
         lst.setAdapter(mContactAdapter);
-        JSONObject JO;
+        lst.setTextFilterEnabled(true);
 
         json_string = getIntent().getExtras().getString("json_data");
         Log.d(TAG, "onCreate: json_string from intent: " + json_string);
@@ -80,6 +87,14 @@ public class ContactList extends AppCompatActivity{
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+//        // Get the intent, verify the action and get the query
+//        Intent searchIntent = getIntent();
+//        if (Intent.ACTION_SEARCH.equals(searchIntent.getAction())) {
+//            String query = searchIntent.getStringExtra(SearchManager.QUERY);
+//            doMySearch(query);
+//        }
+
         final Intent intent = new Intent(this, Contact.class);
 
         lst.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -105,6 +120,9 @@ public class ContactList extends AppCompatActivity{
 
 
 
+
+    private void doMySearch(String query) {
+    }
 
 
 }
