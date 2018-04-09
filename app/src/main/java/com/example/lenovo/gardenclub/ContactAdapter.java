@@ -70,4 +70,10 @@ public class ContactAdapter extends ArrayAdapter{
         TextView tx_name, tx_email, tx_mobile, tx_mbrstatus;
 
     }
+
+    public void filter(String charText) {
+
+    }
+
+
 }

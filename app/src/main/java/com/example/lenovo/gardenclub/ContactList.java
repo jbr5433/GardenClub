@@ -5,8 +5,13 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -35,7 +40,7 @@ import static com.example.lenovo.gardenclub.MainActivity.JSON_STRING;
 
 
 
-public class ContactList extends AppCompatActivity{
+public class ContactList extends AppCompatActivity {
     private static final String TAG = "ContactList";
     String json_string;
     JSONObject mJSONObject;
@@ -51,7 +56,6 @@ public class ContactList extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
-        getSupportActionBar().hide();
 
         JSONObject JO;
         mContactAdapter = new ContactAdapter(this, R.layout.row_layout);
@@ -78,7 +82,6 @@ public class ContactList extends AppCompatActivity{
                 mbrStatus = JO.getString("mbrStatus");
 
                 Contacts contact = new Contacts(name, email, mobile, mbrStatus);
-                Log.d(TAG, "onCreate: contact = " + contact);
                 mContactAdapter.add(contact);
 
                 count++;
@@ -110,18 +113,37 @@ public class ContactList extends AppCompatActivity{
                     e.printStackTrace();
                 }
 
-
-
-
             }
         });
 
+
+
     }
 
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_search, menu);
 
+        MenuItem menuItem = menu.findItem(R.id.search_badge_ID);
+        Log.d(TAG, "onCreateOptionsMenu: starts");
 
+        SearchView searchView = (SearchView) menuItem.getActionView();
 
-    private void doMySearch(String query) {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                mContactAdapter.getFilter().filter(s);
+                Log.d(TAG, "onQueryTextChange: count: " + mContactAdapter.getCount());
+                return false;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
     }
 
 
