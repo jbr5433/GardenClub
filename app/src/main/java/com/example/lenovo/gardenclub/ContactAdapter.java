@@ -3,10 +3,14 @@ package com.example.lenovo.gardenclub;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -16,15 +20,29 @@ import java.util.List;
  * Created by Joe on 3/19/2018.
  */
 
-public class ContactAdapter extends ArrayAdapter{
+public class ContactAdapter extends ArrayAdapter implements Filterable {
+    ValueFilter valueFilter;
+    int prevCnstrntLength;
+    int cnstrntLength;
+    private LayoutInflater inflater;
+    private static final String TAG = "ContactAdapter";
+
     List list = new ArrayList();
+    List fullList = new ArrayList();
+
     public ContactAdapter(@NonNull Context context, int resource) {
         super(context, resource);
+        Log.d(TAG, "ContactAdapter: context: " + context);
+        Log.d(TAG, "ContactAdapter: context class: " + context.getClass());
+        Log.d(TAG, "ContactAdapter: resource: " + resource);
+
     }
 
     public void add(Contacts object) {
         super.add(object);
         list.add(object);
+        fullList = list;
+        Log.d(TAG, "add: object: " + object);
 
     }
 
@@ -45,6 +63,7 @@ public class ContactAdapter extends ArrayAdapter{
         View row;
         row = convertView;
         ContactHolder contactHolder;
+
         if(row == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             row = layoutInflater.inflate(R.layout.row_layout_1, parent, false);
@@ -59,10 +78,12 @@ public class ContactAdapter extends ArrayAdapter{
             contactHolder = (ContactHolder) row.getTag();
         }
         Contacts contact = (Contacts) this.getItem(position);
+        Log.d(TAG, "getView: contact = " + contact);
         contactHolder.tx_name.setText(contact.getName());
 //        contactHolder.tx_email.setText(contact.getEmail());
 //        contactHolder.tx_mobile.setText(contact.getMobile());
         contactHolder.tx_mbrstatus.setText(contact.getMbrStatus());
+
         return row;
     }
 
@@ -71,8 +92,62 @@ public class ContactAdapter extends ArrayAdapter{
 
     }
 
-    public void filter(String charText) {
+    @Override
+    public Filter getFilter() {
+        if (valueFilter == null) {
+            valueFilter = new ValueFilter();
+        }
+        return valueFilter;
+    }
 
+    private class ValueFilter extends Filter {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults results = new FilterResults();
+            Contacts current;
+            Log.d(TAG, "performFiltering: constraint: " + constraint);
+
+            prevCnstrntLength = cnstrntLength;
+            cnstrntLength = constraint.length();
+
+            if (constraint != null && cnstrntLength > 0) {
+                List filterList = new ArrayList<>();
+                filterList.clear();
+                for (int i = 0; i < list.size(); i++) {
+                     current = (Contacts) list.get(i);
+                    if ((current.getName().toUpperCase().contains(constraint.toString().toUpperCase()))) {
+                        filterList.add(current);
+                    }
+                }
+                results.count = filterList.size();
+                results.values = filterList;
+                if (cnstrntLength < prevCnstrntLength) {
+                    filterList = new ArrayList();
+                    for (int i = 0; i < fullList.size(); i++) {
+                        current = (Contacts) fullList.get(i);
+                        if ((current.getName().toUpperCase().contains(constraint.toString().toUpperCase()))) {
+                            filterList.add(current);
+                        }
+                    }
+                    results.count = filterList.size();
+                    results.values = filterList;
+                }
+
+            } else if (cnstrntLength < prevCnstrntLength) {
+                results.count = fullList.size();
+                results.values = fullList;
+            }  else {
+                results.count = fullList.size();
+                results.values = fullList;
+            }
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            list = (ArrayList) results.values;
+            notifyDataSetChanged();
+        }
     }
 
 

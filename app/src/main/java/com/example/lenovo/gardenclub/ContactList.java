@@ -38,8 +38,6 @@ import java.util.List;
 import static com.example.lenovo.gardenclub.MainActivity.JSON_STRING;
 
 
-
-
 public class ContactList extends AppCompatActivity {
     private static final String TAG = "ContactList";
     String json_string;
@@ -125,9 +123,15 @@ public class ContactList extends AppCompatActivity {
         menuInflater.inflate(R.menu.menu_search, menu);
 
         MenuItem menuItem = menu.findItem(R.id.search_badge_ID);
-        Log.d(TAG, "onCreateOptionsMenu: starts");
 
         SearchView searchView = (SearchView) menuItem.getActionView();
+
+        //additional features
+//        searchView.setActivated(true);
+//        searchView.setQueryHint("Type your keyword here");
+//        searchView.onActionViewExpanded();
+//        searchView.setIconified(false);
+//        searchView.clearFocus();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -138,9 +142,9 @@ public class ContactList extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String s) {
                 mContactAdapter.getFilter().filter(s);
-                Log.d(TAG, "onQueryTextChange: count: " + mContactAdapter.getCount());
                 return false;
             }
+
         });
 
         return super.onCreateOptionsMenu(menu);
