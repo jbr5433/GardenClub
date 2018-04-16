@@ -17,8 +17,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView2"/>
 
-
-
     <include
         android:id="@+id/include"
         layout="@layout/base_acl"
@@ -157,36 +155,42 @@
 
     <Button
         android:id="@+id/btn_text"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
         android:text="@string/Text"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_call"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/textView14"/>
 
     <Button
         android:id="@+id/btn_call"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="8dp"
         android:text="@string/Call"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/btn_text"
-        app:layout_constraintEnd_toStartOf="@+id/btn_email"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toEndOf="@+id/btn_text"
-        app:layout_constraintTop_toTopOf="@+id/btn_text"/>
+        app:layout_constraintTop_toTopOf="@+id/btn_text"
+        app:layout_constraintVertical_bias="0.0"/>
 
     <Button
         android:id="@+id/btn_email"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/Email"
+        android:layout_marginStart="4dp"
+        android:text="Email"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/btn_call"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btn_call"
-        app:layout_constraintTop_toTopOf="@+id/btn_call"/>
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/btn_call"
+        app:layout_constraintVertical_bias="0.0"/>
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline2"
@@ -206,5 +210,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/include"
         app:srcCompat="@drawable/carolinayellowjessaminemed1"/>
+
+    <Button
+        android:id="@+id/brn_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Edit"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_email"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btn_email"
+        app:layout_constraintTop_toTopOf="@+id/btn_email"/>
 
 </android.support.constraint.ConstraintLayout>

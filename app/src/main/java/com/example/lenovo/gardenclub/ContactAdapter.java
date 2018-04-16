@@ -1,12 +1,14 @@
 package com.example.lenovo.gardenclub;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -26,23 +28,47 @@ public class ContactAdapter extends ArrayAdapter implements Filterable {
     int cnstrntLength;
     private LayoutInflater inflater;
     private static final String TAG = "ContactAdapter";
+    String item;
 
     List list = new ArrayList();
     List fullList = new ArrayList();
 
     public ContactAdapter(@NonNull Context context, int resource) {
         super(context, resource);
-        Log.d(TAG, "ContactAdapter: context: " + context);
-        Log.d(TAG, "ContactAdapter: context class: " + context.getClass());
-        Log.d(TAG, "ContactAdapter: resource: " + resource);
-
     }
+
+    public AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            if (list != null) {
+                Contacts item = (Contacts) adapterView.getItemAtPosition(i);
+                //                contactHolder.tx_name.setText(contact.getName());
+
+//                Contacts contact = (Contacts) this.getItem(position);
+//                Log.d(TAG, "getView: contact = " + contact);
+//                contactHolder.tx_name.setText(contact.getName());
+
+                String name = item.getName();
+                String uID = item.getUserID();
+                String loginEmail = item.getLoginEmail();
+
+
+                Log.d(TAG, "onItemClick: item: " + item.getName());
+                Log.d(TAG, "onItemClick: list: " + list);
+                Log.d(TAG, "onItemClick: uID: " + uID);
+                Intent intent = new Intent(adapterView.getContext(), Contact.class);
+                intent.putExtra("user_id", uID);
+                intent.putExtra("login_email", loginEmail);
+                adapterView.getContext().startActivity(intent);
+
+            }
+        }
+    };
 
     public void add(Contacts object) {
         super.add(object);
         list.add(object);
         fullList = list;
-        Log.d(TAG, "add: object: " + object);
 
     }
 
@@ -140,6 +166,7 @@ public class ContactAdapter extends ArrayAdapter implements Filterable {
                 results.count = fullList.size();
                 results.values = fullList;
             }
+            Log.d(TAG, "performFiltering: results.values: " + results.values);
             return results;
         }
 

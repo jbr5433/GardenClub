@@ -44,5 +44,6 @@
     <string name="bio_info">Biographical Info</string>
     <string name="year_active">Year Turned Active</string>
     <string name="dyk">Did You Know?</string>
+    <string name="edit">Edit</string>
 
 </resources>

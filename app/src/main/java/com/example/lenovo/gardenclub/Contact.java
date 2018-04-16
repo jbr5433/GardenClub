@@ -1,16 +1,20 @@
 package com.example.lenovo.gardenclub;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,7 +43,7 @@ public class Contact extends AppCompatActivity {
     private static final String TAG = "Contact";
     String finalEmail = null;
     JSONObject JO;
-    String SBString;
+    String SBString, loginEmail;
 
 
     public Contact() throws JSONException {
@@ -48,28 +52,25 @@ public class Contact extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /////////////////////////////////////////////////////////////
         Intent intent = new Intent(this, Contact.class);
         intent.getExtras();
         setContentView(R.layout.activity_contact);
-        json = getIntent().getExtras().getString("json_object");
+//        json = getIntent().getExtras().getString("json_object");
+        userID = getIntent().getExtras().getString("user_id");
+        loginEmail = getIntent().getExtras().getString("login_email");
         getSupportActionBar().hide();
 
-        try {
-            jsonObject = new JSONObject(json);
+//        try {
+////            jsonObject = new JSONObject(json);
+//
+////            Toast.makeText(getApplicationContext(), jsonObject.getString("userID"), Toast.LENGTH_SHORT).show();
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
 
-//            Toast.makeText(getApplicationContext(), jsonObject.getString("userID"), Toast.LENGTH_SHORT).show();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
-
-        try {
-            userID = jsonObject.getString("userID");
-            new BackgroundTask1().execute("get_info", userID);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        //            userID = jsonObject.getString("userID");
+        new BackgroundTask1().execute("get_info", userID);
     }
 
     public void getJSON(View view) {
@@ -185,9 +186,10 @@ public class Contact extends AppCompatActivity {
                     final TextView primaryContactTV = (TextView) findViewById(R.id.primaryContactTV);
                     final TextView secondaryContactTV = (TextView) findViewById(R.id.secondaryContactTV);
                     final TextView emailTV = (TextView) findViewById(R.id.emailTV);
+                    int isUser = 0;
 
                     for (int i = 0; i <= jsonArray.length(); i++) {
-                        Log.d(TAG, "doInBackground: jsonArray ->" + jsonArray.getJSONObject(i));
+//                        Log.d(TAG, "doInBackground: jsonArray ->" + jsonArray.getJSONObject(i));
 
                         if (jsonArray.getJSONObject(i).getString("userID").equals(userID)) {
                             //////////////////////////////////////////////////it works
@@ -221,6 +223,7 @@ public class Contact extends AppCompatActivity {
                             CmteAssign3CoChair = jsonArray.getJSONObject(i).getString("CmteAssign3CoChair");
                             BiographicalInfo = jsonArray.getJSONObject(i).getString("BiographicalInfo");
 
+
                             final String finalFirstName = firstName;
                             final String finalLastName = lastName;
                             final String finalMbrStatus = mbrStatus;
@@ -252,6 +255,65 @@ public class Contact extends AppCompatActivity {
 
                                     TextView tvMoreInfo = (TextView) findViewById(R.id.tv_more_info);
                                     TextView tvBack = (TextView) findViewById(R.id.tv_back);
+                                    final TextView tvEdit = (TextView) findViewById(R.id.tv_edit);
+                                    final EditText editText;
+                                    final AlertDialog alertDialog;
+//                                    final AlertDialog alertDialog;
+                                    alertDialog = new AlertDialog.Builder(getApplicationContext()).create();
+                                    final AlertDialog.Builder builder;
+                                    builder = new AlertDialog.Builder(Contact.this);
+                                    editText = new EditText(getApplicationContext());
+
+                                    Log.d(TAG, "run: finalEmail: " + finalEmail);
+                                    Log.d(TAG, "run: loginEmail: " + loginEmail);
+                                    if (finalEmail.equals(loginEmail)) {
+                                        tvEdit.setText("Edit");
+                                        builder.setTitle("Edit Fields");
+                                        builder.setView(editText);
+                                        // TODO: 4/15/2018 lol wait WHAT
+//                                        builder.setPositiveButton(), .... dafu
+
+                                        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "SAVE TEXT", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                                textView.setText(editText.getText());
+                                            }
+                                        });
+
+                                        tvEdit.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                Toast.makeText(getApplicationContext(), "Tap the fields you wish to change", Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+
+                                        //all other textviews.setOnCliCkListener(editFields);
+
+                                        View.OnClickListener editFields = new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                int viewId = view.getId();
+                                                if (viewId == nameTV.getId()) {
+                                                    // TODO: 4/15/2018 get alertDialog working, app crashes on line 296
+                                                    alertDialog.show();
+                                                    editText.setText(nameTV.getText());
+                                                }
+                                                Log.d(TAG, "onClick: viewID: " + viewId);
+                                                Log.d(TAG, "onClick: nameTV.getId: " + nameTV.getId());
+//                                            editText.setText(view.getId().get tvEdit.getText());/////<---------
+                                            }
+                                        };
+
+
+                                        nameTV.setOnClickListener(editFields);
+                                        mbrStatusTV.setOnClickListener(editFields);
+                                        spouseTV.setOnClickListener(editFields);
+                                        addressTV.setOnClickListener(editFields);
+                                        primaryContactTV.setOnClickListener(editFields);
+                                        secondaryContactTV.setOnClickListener(editFields);
+                                        emailTV.setOnClickListener(editFields);
+
+                                    }
 
                                     tvMoreInfo.setOnClickListener(new View.OnClickListener() {
                                         @Override
@@ -387,8 +449,6 @@ public class Contact extends AppCompatActivity {
 //            writeToFile(json_string);
             JSONObject jsonObject = null;
             Log.d(TAG, "onPostExecute: result:: " + result);
-
-
             try {
                 jsonObject = new JSONObject(String.valueOf(SBString));
                 JSONArray jsonArray = jsonObject.getJSONArray("server_response");
@@ -404,7 +464,7 @@ public class Contact extends AppCompatActivity {
     public void parseJson(View view) {
         new BackgroundTask1().execute();
         if (json_string == null) {
-            Toast.makeText(getApplicationContext(), "First Get JSON", Toast.LENGTH_LONG).show();
+//            Toast.makeText(getApplicationContext(), "First Get JSON", Toast.LENGTH_LONG).show();
 
         } else {
             Intent intent = new Intent(this, ContactList.class);
