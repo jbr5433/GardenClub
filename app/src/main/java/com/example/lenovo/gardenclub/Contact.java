@@ -18,6 +18,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,9 +43,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class Contact extends AppCompatActivity {
+    int viewId_placeholder = 0;
     Button btnEmail, btnCall, btnText;
     TextView emailID;
     JSONObject jsonObject;
@@ -86,13 +99,10 @@ public class Contact extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            Log.d(TAG, "doInBackground: starts");
             type = params[0];
             StringBuilder stringBuilder = null;
-            Log.d(TAG, "doInBackground: type: " + type);
             if (type.equals("post_info")) {
                 try {
-                    Log.d(TAG, "doInBackground: type equals post_info");
                     userID = params[1];
 //                String password = params[2];
                     URL url = new URL(json_get);
@@ -104,8 +114,8 @@ public class Contact extends AppCompatActivity {
                     OutputStream outputStream = httpURLConnection.getOutputStream();
                     BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
                     //CHANGE THIS: FirstName and LastName
-                    userID = jsonObject.getString("UserID");
-                    String post_data = URLEncoder.encode("UserID", "UTF-8") + "=" + URLEncoder.encode(userID, "UTF-8");
+                    userID = jsonObject.getString("ID");
+                    String post_data = URLEncoder.encode("ID", "UTF-8") + "=" + URLEncoder.encode(userID, "UTF-8");
                     bufferedWriter.write(post_data);
                     bufferedWriter.flush();
                     bufferedWriter.close();
@@ -124,7 +134,6 @@ public class Contact extends AppCompatActivity {
                     stringBuilder = new StringBuilder();
                     while ((JSON_STRING = bufferedReader.readLine()) != null) {
                         stringBuilder.append(JSON_STRING + "\n");
-                        Log.d(TAG, "doInBackground: JSON_STRING: " + JSON_STRING);
                     }
 
                     bufferedReader.close();
@@ -168,16 +177,14 @@ public class Contact extends AppCompatActivity {
                     String firstName;
                     String lastName;
                     String spouse;
-                    String SreetAddress;
-                    String City;
-                    String State;
+                    String SreetAddress, Committee, CommitteeTitle, AzaleaGardenTourCommitteesTitle, AzaleaGardenTourCommittees;
+                    String CityState, WorkNum, Officers;
                     String ZipCode, PrimaryContactNumber, SecondaryContactNumber, TypeofPrimaryContactNo, TypeofSecondaryContactNo, Office, OfficerTitle, ExecutiveBdMbrship;
                     String CurrentCmteAssignment1, CmteAssign1Chair, CmteAssign1CoChair, CurrentCmteAssignment2, CmteAssign2Chair, CmteAssign2CoChair;
                     String CurrentCmteAssignment3;
                     String CmteAssign3Chair;
                     String CmteAssign3CoChair;
                     String BiographicalInfo;
-                    Log.d(TAG, "doInBackground: userID::: " + userID);
 
                     final TextView nameTV = (TextView) findViewById(R.id.nameTV);
                     final TextView mbrStatusTV = (TextView) findViewById(R.id.mbrStatusTV);
@@ -191,46 +198,35 @@ public class Contact extends AppCompatActivity {
                     for (int i = 0; i <= jsonArray.length(); i++) {
 //                        Log.d(TAG, "doInBackground: jsonArray ->" + jsonArray.getJSONObject(i));
 
-                        if (jsonArray.getJSONObject(i).getString("userID").equals(userID)) {
-                            //////////////////////////////////////////////////it works
-                            email = jsonArray.getJSONObject(i).getString("email");
-                            mbrStatus = jsonArray.getJSONObject(i).getString("mbrStatus");
-                            userID = jsonArray.getJSONObject(i).getString("userID");
-                            photoID = jsonArray.getJSONObject(i).getString("photoID");
-                            yearTurnedActive = jsonArray.getJSONObject(i).getString("yearTurnedActive");
-                            firstName = jsonArray.getJSONObject(i).getString("firstName");
-                            lastName = jsonArray.getJSONObject(i).getString("lastName");
-                            spouse = jsonArray.getJSONObject(i).getString("spouse");
-                            SreetAddress = jsonArray.getJSONObject(i).getString("StreetAddress");
-                            City = jsonArray.getJSONObject(i).getString("City");
-                            State = jsonArray.getJSONObject(i).getString("State");
-                            ZipCode = jsonArray.getJSONObject(i).getString("ZipCode");
-                            PrimaryContactNumber = jsonArray.getJSONObject(i).getString("mobile");
-                            SecondaryContactNumber = jsonArray.getJSONObject(i).getString("SecondaryContactNumber");
-                            TypeofPrimaryContactNo = jsonArray.getJSONObject(i).getString("TypeofPrimaryContactNo");
-                            TypeofSecondaryContactNo = jsonArray.getJSONObject(i).getString("TypeofSecondaryContactNo");
-                            Office = jsonArray.getJSONObject(i).getString("Office");
-                            OfficerTitle = jsonArray.getJSONObject(i).getString("OfficerTitle");
-                            ExecutiveBdMbrship = jsonArray.getJSONObject(i).getString("ExecutiveBdMbrship");
-                            CurrentCmteAssignment1 = jsonArray.getJSONObject(i).getString("CurrentCmteAssignment1");
-                            CmteAssign1Chair = jsonArray.getJSONObject(i).getString("CmteAssign1Chair");
-                            CmteAssign1CoChair = jsonArray.getJSONObject(i).getString("CmteAssign1CoChair");
-                            CurrentCmteAssignment2 = jsonArray.getJSONObject(i).getString("CurrentCmteAssignment2");
-                            CmteAssign2Chair = jsonArray.getJSONObject(i).getString("CmteAssign2Chair");
-                            CmteAssign2CoChair = jsonArray.getJSONObject(i).getString("CmteAssign2CoChair");
-                            CurrentCmteAssignment3 = jsonArray.getJSONObject(i).getString("CurrentCmteAssignment3");
-                            CmteAssign3Chair = jsonArray.getJSONObject(i).getString("CmteAssign3Chair");
-                            CmteAssign3CoChair = jsonArray.getJSONObject(i).getString("CmteAssign3CoChair");
-                            BiographicalInfo = jsonArray.getJSONObject(i).getString("BiographicalInfo");
 
+                        if (jsonArray.getJSONObject(i).getString("ID").equals(userID)) {
+                            email = jsonArray.getJSONObject(i).getString("EmailAddress");
+                            mbrStatus = jsonArray.getJSONObject(i).getString("MbrStatus");
+                            userID = jsonArray.getJSONObject(i).getString("ID");
+                            photoID = jsonArray.getJSONObject(i).getString("PhotoID");
+                            yearTurnedActive = jsonArray.getJSONObject(i).getString("YearTA");
+                            firstName = jsonArray.getJSONObject(i).getString("FirstName");
+                            lastName = jsonArray.getJSONObject(i).getString("LastName");
+                            spouse = jsonArray.getJSONObject(i).getString("Spouse");
+                            SreetAddress = jsonArray.getJSONObject(i).getString("StreetAddress");
+                            CityState = jsonArray.getJSONObject(i).getString("CityState");
+                            ZipCode = jsonArray.getJSONObject(i).getString("ZipCode");
+                            PrimaryContactNumber = jsonArray.getJSONObject(i).getString("PrimNum");
+                            SecondaryContactNumber = jsonArray.getJSONObject(i).getString("SecNum");
+                            WorkNum = jsonArray.getJSONObject(i).getString("WorkNum");
+                            Officers = jsonArray.getJSONObject(i).getString("Officers");
+                            Committee = jsonArray.getJSONObject(i).getString("Committee");
+                            CommitteeTitle = jsonArray.getJSONObject(i).getString("CommitteeTitle");
+                            AzaleaGardenTourCommitteesTitle = jsonArray.getJSONObject(i).getString("AzaleaGardenTourCommitteesTitles");
+                            AzaleaGardenTourCommittees = jsonArray.getJSONObject(i).getString("AzaleaGardenTourCommittees");
+                            BiographicalInfo = jsonArray.getJSONObject(i).getString("BiographicalInfo");
 
                             final String finalFirstName = firstName;
                             final String finalLastName = lastName;
                             final String finalMbrStatus = mbrStatus;
                             final String finalSpouse = spouse;
                             final String finalSreetAddress = SreetAddress;
-                            final String finalCity = City;
-                            final String finalState = State;
+                            final String finalCityState = CityState;
                             final String finalZipCode = ZipCode;
                             final String finalPrimaryContactNumber = PrimaryContactNumber;
                             final String finalSecondaryContactNumber = SecondaryContactNumber;
@@ -238,47 +234,102 @@ public class Contact extends AppCompatActivity {
                             final String finalBiographicalInfo = BiographicalInfo;
 
                             final String finalYearTurnedActive = yearTurnedActive;
+                            final String finalSpouse1 = spouse;
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     nameTV.setText(finalFirstName.concat(" " + finalLastName));
                                     mbrStatusTV.setText(finalMbrStatus);
                                     spouseTV.setText(finalSpouse);
-                                    addressTV.setText(finalSreetAddress.concat(",\n" + finalCity + ", " + finalState + " " + finalZipCode));
+                                    addressTV.setText(finalSreetAddress.concat(",\n" + finalCityState + ", " + " " + finalZipCode));
                                     primaryContactTV.setText(finalPrimaryContactNumber);
                                     secondaryContactTV.setText(finalSecondaryContactNumber);
                                     emailTV.setText(finalEmail);
 
-                                    btnEmail = (Button) findViewById(R.id.btn_email);
-                                    btnCall = (Button) findViewById(R.id.btn_call);
-                                    btnText = (Button) findViewById(R.id.btn_text);
+                                    btnEmail = findViewById(R.id.btn_email);
+                                    btnCall = findViewById(R.id.btn_call);
+                                    btnText = findViewById(R.id.btn_text);
 
-                                    TextView tvMoreInfo = (TextView) findViewById(R.id.tv_more_info);
-                                    TextView tvBack = (TextView) findViewById(R.id.tv_back);
-                                    final TextView tvEdit = (TextView) findViewById(R.id.tv_edit);
+                                    TextView tvMoreInfo = findViewById(R.id.tv_more_info);
+                                    final TextView tvBack = findViewById(R.id.tv_back);
+                                    final TextView tvEdit = findViewById(R.id.tv_edit);
                                     final EditText editText;
-                                    final AlertDialog alertDialog;
-//                                    final AlertDialog alertDialog;
-                                    alertDialog = new AlertDialog.Builder(getApplicationContext()).create();
+                                    AlertDialog alertDialog = null;
                                     final AlertDialog.Builder builder;
-                                    builder = new AlertDialog.Builder(Contact.this);
+                                    builder = new AlertDialog.Builder(new ContextThemeWrapper(Contact.this, R.style.myDialog));
                                     editText = new EditText(getApplicationContext());
 
-                                    Log.d(TAG, "run: finalEmail: " + finalEmail);
-                                    Log.d(TAG, "run: loginEmail: " + loginEmail);
                                     if (finalEmail.equals(loginEmail)) {
+                                        final int nameId = nameTV.getId();
+                                        final int spouseId = spouseTV.getId();
+                                        final int addressId = addressTV.getId();
+                                        final int primId = primaryContactTV.getId();
+                                        final int secId = secondaryContactTV.getId();
+                                        final int emailId = emailTV.getId();
+
+                                        //----!!!!!!---- Update Date begins ----!!!!!!----
+                                        //no action is attached to this update, so add it within an onclicklistener
+                                        String url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/update.php";
+
+                                        List<NameValuePair> params = new ArrayList<NameValuePair>();
+                                        params.add(new BasicNameValuePair("ID", userID));
+                                        params.add(new BasicNameValuePair("Spouse", finalSpouse));
+//                                        params.add(new BasicNameValuePair("StreetAddress", finalSreetAddress));
+                                        params.add(new BasicNameValuePair("PrimNum", finalPrimaryContactNumber));
+                                        params.add(new BasicNameValuePair("SecNum", finalSecondaryContactNumber));
+
+                                        //app will crash once you uncomment this
+//                                        String resultServer = getHttpPost(url, params);
+//                                        Log.d(TAG, "run: resultserver: " + resultServer);
+
+                                        // !!!!!!!!!!!!! UPDATE ENDS !!!!!!!!!!!!!!!
+
                                         tvEdit.setText("Edit");
                                         builder.setTitle("Edit Fields");
                                         builder.setView(editText);
-                                        // TODO: 4/15/2018 lol wait WHAT
-//                                        builder.setPositiveButton(), .... dafu
+                                        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        if (viewId_placeholder == nameId) {
+                                                            nameTV.setText(editText.getText());
+                                                        }
+                                                        if (viewId_placeholder == spouseId) {
+                                                            spouseTV.setText(editText.getText());
+                                                        }
+                                                        if (viewId_placeholder == addressId) {
+                                                            /** FIX THIS _____
+                                                            builder.setTitle("Edit Street Address");
+                                                            alertDialog.show();
+                                                            builder.setTitle("Edit City and State");
+                                                            alertDialog.show();
+                                                            builder.setTitle("Edit Zipcode");
+                                                            addressTV.setText(editText.getText());
+                                                             */
+                                                        }
+                                                        if (viewId_placeholder == primId) {
+                                                            primaryContactTV.setText(editText.getText());
+                                                        }
+                                                        if (viewId_placeholder == secId) {
+                                                            secondaryContactTV.setText(editText.getText());
+                                                        }
+                                                        if (viewId_placeholder == emailId) {
+                                                            //
+                                                        }
+                                                    }
+                                                })
+                                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
 
-                                        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "SAVE TEXT", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-//                                                textView.setText(editText.getText());
-                                            }
-                                        });
+                                                    }
+                                                });
+
+//                                        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "SAVE TEXT", new DialogInterface.OnClickListener() {
+//                                            @Override
+//                                            public void onClick(DialogInterface dialogInterface, int i) {
+////                                                textView.setText(editText.getText());
+//                                            }
+//                                        });
 
                                         tvEdit.setOnClickListener(new View.OnClickListener() {
                                             @Override
@@ -287,19 +338,50 @@ public class Contact extends AppCompatActivity {
                                             }
                                         });
 
+                                        alertDialog = builder.create();
+
                                         //all other textviews.setOnCliCkListener(editFields);
 
+                                        final AlertDialog finalAlertDialog = alertDialog;
                                         View.OnClickListener editFields = new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
                                                 int viewId = view.getId();
+
                                                 if (viewId == nameTV.getId()) {
-                                                    // TODO: 4/15/2018 get alertDialog working, app crashes on line 296
-                                                    alertDialog.show();
+                                                    viewId_placeholder = viewId;
+                                                    finalAlertDialog.show();
                                                     editText.setText(nameTV.getText());
                                                 }
-                                                Log.d(TAG, "onClick: viewID: " + viewId);
-                                                Log.d(TAG, "onClick: nameTV.getId: " + nameTV.getId());
+                                                if (viewId == mbrStatusTV.getId()) {
+                                                    viewId_placeholder = viewId;
+                                                    Toast.makeText(getApplicationContext(), "You cannot edit your Member Status from this application", Toast.LENGTH_LONG).show();
+
+                                                }
+                                                if (viewId == spouseTV.getId()) {
+                                                    viewId_placeholder = viewId;
+                                                    finalAlertDialog.show();
+                                                    editText.setText(spouseTV.getText());
+                                                }
+                                                if (viewId == addressTV.getId()) {
+                                                    viewId_placeholder = viewId;
+                                                    finalAlertDialog.show();
+                                                    editText.setText(addressTV.getText());
+                                                }
+                                                if (viewId == primaryContactTV.getId()) {
+                                                    viewId_placeholder = viewId;
+                                                    finalAlertDialog.show();
+                                                    editText.setText(primaryContactTV.getText());
+                                                }
+                                                if (viewId == secondaryContactTV.getId()) {
+                                                    viewId_placeholder = viewId;
+                                                    finalAlertDialog.show();
+                                                    editText.setText(secondaryContactTV.getText());
+                                                }
+                                                if (viewId == emailTV.getId()) {
+                                                    viewId_placeholder = viewId;
+                                                    Toast.makeText(getApplicationContext(), "You cannot edit your email address from this application", Toast.LENGTH_LONG).show();
+                                                }
 //                                            editText.setText(view.getId().get tvEdit.getText());/////<---------
                                             }
                                         };
@@ -321,8 +403,10 @@ public class Contact extends AppCompatActivity {
                                             Intent moreInfoIntent = new Intent(getApplicationContext(), MoreInfo.class);
                                             moreInfoIntent.putExtra("bio", finalBiographicalInfo);
                                             moreInfoIntent.putExtra("YTA", finalYearTurnedActive);
+                                            moreInfoIntent.putExtra("login_email", loginEmail);
+                                            moreInfoIntent.putExtra("user_email", finalEmail);
                                             startActivity(moreInfoIntent);
-                                            
+
                                         }
                                     });
 
@@ -389,7 +473,6 @@ public class Contact extends AppCompatActivity {
                             });
                             Intent intent = new Intent(String.valueOf(this));
                             intent.putExtra("json_data", json_string);
-                            Log.d(TAG, "doInBackground: json_data lmao: " + json_string);
                         }
                     }
 
@@ -425,6 +508,90 @@ public class Contact extends AppCompatActivity {
             return null;
         }
 
+        public boolean SaveData(String firstName, String lastName, String spouse, String streetAddress, String primNum, String secNum) {
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+//            final TextView txtUserID = (TextView)findViewById(R.id.txtUserID);
+//            final TextView txtAppointmentID = (TextView)findViewById(R.id.txtAppointmentID);
+//            final EditText txtType = (EditText)findViewById(R.id.txtType);
+//            final EditText txtDate = (EditText)findViewById(R.id.txtDate);
+//            final EditText txtTime = (EditText)findViewById(R.id.txtTime);
+
+            //Dialog
+            final AlertDialog.Builder ad = new AlertDialog.Builder(getApplicationContext());
+
+            ad.setTitle("Error! ");
+            ad.setIcon(android.R.drawable.btn_star_big_on);
+            ad.setPositiveButton("Close", null);
+
+            String url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/update.php";
+            params.add(new BasicNameValuePair("Spouse", spouse));
+            params.add(new BasicNameValuePair("FirstName", firstName));
+            params.add(new BasicNameValuePair("LastName", lastName));
+            params.add(new BasicNameValuePair("StreetAddress", streetAddress));
+            params.add(new BasicNameValuePair("PrimNum", primNum));
+            params.add(new BasicNameValuePair("SecNum", secNum));
+
+            String resultServer  = getHttpPost(url,params);
+            Log.d(TAG, "resultServer - updateData: " + resultServer);
+
+            /*** Default Value ***/
+            String strStatusID = "0";
+            String strMessage = "Unknown Status!";
+
+            JSONObject c;
+            try {
+                c = new JSONObject(resultServer);
+                strStatusID = c.getString("StatusID");
+                strMessage = c.getString("Message");
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            // Prepare Save Data
+            if(strStatusID.equals("0"))
+            {
+                ad.setMessage(strMessage);
+                ad.show();
+                return false;
+            }
+            else
+            {
+                Toast.makeText(Contact.this, "Update Data Successfully", Toast.LENGTH_SHORT).show();
+            }
+
+            return true;
+        }
+
+        public String getHttpPost(String url,List<NameValuePair> params) {
+            StringBuilder str = new StringBuilder();
+            HttpClient client = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost(url);
+
+            try {
+                httpPost.setEntity(new UrlEncodedFormEntity(params));
+                HttpResponse response = client.execute(httpPost);
+                StatusLine statusLine = response.getStatusLine();
+                int statusCode = statusLine.getStatusCode();
+                if (statusCode == 200) { // Status OK
+                    HttpEntity entity = response.getEntity();
+                    InputStream content = entity.getContent();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        str.append(line);
+                    }
+                } else {
+                    Log.e("Log", "Failed to download result..");
+                }
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return str.toString();
+        }
+
 
         @Override
         protected void onPreExecute() {
@@ -457,7 +624,6 @@ public class Contact extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
         }
     }
 

@@ -19,6 +19,15 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -81,11 +90,11 @@ public class ContactList extends AppCompatActivity {
 
             while(count <= mJSONArray.length()) {
                 JO = mJSONArray.getJSONObject(count);
-                name = JO.getString("firstName").concat(" " + JO.getString("lastName"));
-                email = JO.getString("email");
-                mobile = JO.getString("mobile");
-                mbrStatus = JO.getString("mbrStatus");
-                userID = JO.getString("userID");
+                name = JO.getString("FirstName").concat(" " + JO.getString("LastName"));
+                email = JO.getString("Email");
+                mobile = JO.getString("PrimNum");
+                mbrStatus = JO.getString("MbrStatus");
+                userID = JO.getString("ID");
 
                 Contacts contact = new Contacts(name, email, mobile, mbrStatus, userID, loginEmail);
                 mContactAdapter.add(contact);
@@ -162,4 +171,8 @@ public class ContactList extends AppCompatActivity {
     }
 
 
+
+
 }
+
+

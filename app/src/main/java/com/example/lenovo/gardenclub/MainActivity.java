@@ -42,9 +42,12 @@ import java.net.URLEncoder;
 //for the webview, you can use .nextPage() == true or w/e and then get the email upon the submit button being clicked
 
 /**
- * for editable page, make all edit text if the userID matches, then have a submit button?
+ * User photo images <-----
  *
- * Android.processHTML(str) doesn't do shit
+ * Primary contact number edit, then update that for the call and text button
+ *
+ * update database with edited information:
+ * --> this may be done with a php file
  *
  */
 
@@ -60,9 +63,6 @@ public class MainActivity extends AppCompatActivity {
     int jsonParsed = 0;
      Intent intent;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,12 +73,14 @@ public class MainActivity extends AppCompatActivity {
         UsernameEt = (EditText) findViewById(R.id.et_login);
         PasswordEt = (EditText) findViewById(R.id.et_pass);
 
+        Login.setVisibility(View.GONE);
+        UsernameEt.setVisibility(View.GONE);
+        PasswordEt.setVisibility(View.GONE);
+
         username = UsernameEt.getText().toString();
         password = PasswordEt.getText().toString();
 
-
-
-
+        //
 
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,6 +88,22 @@ public class MainActivity extends AppCompatActivity {
                 String username = UsernameEt.getText().toString();
                 String password = PasswordEt.getText().toString();
                 String type = "login";
+
+//                StringBuilder sb = new StringBuilder();
+////                sb.append("document.getElementsByTagName('form')[0].onsubmit = function () {");
+//                sb.append("var login = function () {");
+//                sb.append("var objPWD = " + password + ";objAccount  = " + username + ";var str = '';");
+//                sb.append("var inputs = document.getElementsByTagName('input');");
+//                sb.append("for (var i = 0; i < inputs.length; i++) {");
+//                sb.append("if (inputs[i].name.toLowerCase() === 'pwd') {inputs[i].value = " + password + ";}");
+//                sb.append("else if (inputs[i].name.toLowerCase() === 'log') {inputs[i].value = " + username + ";}");
+//                sb.append("}");
+//                sb.append("if (objAccount != null) {str += objAccount.value;}");
+////                sb.append("if (objPWD != null) { str += ' , ' + objPWD.value;}");
+//                sb.append("window.Android.processHTML(str);");
+//                sb.append("return true;");
+//                sb.append("};");
+////                webview.loadUrl("javascript:" + sb.toString());
 
                 parseJson(v);
 //                BackgroundWorker backgroundWorker = new BackgroundWorker(MainActivity.this);
@@ -241,7 +259,6 @@ public class MainActivity extends AppCompatActivity {
                 StringBuilder stringBuilder = new StringBuilder();
                 while ((JSON_STRING = bufferedReader.readLine()) != null) {
                     stringBuilder.append(JSON_STRING+"\n");
-                    Log.d(TAG, "doInBackground: stringBuilder: " + stringBuilder.toString());
                 }
 //                json_string = stringBuilder.toString();
 
