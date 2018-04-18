@@ -39,13 +39,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.annotation.Annotation;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class Contact extends AppCompatActivity {
     int viewId_placeholder = 0;
@@ -57,6 +57,8 @@ public class Contact extends AppCompatActivity {
     String finalEmail = null;
     JSONObject JO;
     String SBString, loginEmail;
+    StringBuilder str;
+    String udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec, udBio;
 
 
     public Contact() throws JSONException {
@@ -177,7 +179,7 @@ public class Contact extends AppCompatActivity {
                     String firstName;
                     String lastName;
                     String spouse;
-                    String SreetAddress, Committee, CommitteeTitle, AzaleaGardenTourCommitteesTitle, AzaleaGardenTourCommittees;
+                    String StreetAddress, Committee, CommitteeTitle, AzaleaGardenTourCommitteesTitle, AzaleaGardenTourCommittees;
                     String CityState, WorkNum, Officers;
                     String ZipCode, PrimaryContactNumber, SecondaryContactNumber, TypeofPrimaryContactNo, TypeofSecondaryContactNo, Office, OfficerTitle, ExecutiveBdMbrship;
                     String CurrentCmteAssignment1, CmteAssign1Chair, CmteAssign1CoChair, CurrentCmteAssignment2, CmteAssign2Chair, CmteAssign2CoChair;
@@ -198,7 +200,6 @@ public class Contact extends AppCompatActivity {
                     for (int i = 0; i <= jsonArray.length(); i++) {
 //                        Log.d(TAG, "doInBackground: jsonArray ->" + jsonArray.getJSONObject(i));
 
-
                         if (jsonArray.getJSONObject(i).getString("ID").equals(userID)) {
                             email = jsonArray.getJSONObject(i).getString("EmailAddress");
                             mbrStatus = jsonArray.getJSONObject(i).getString("MbrStatus");
@@ -208,7 +209,7 @@ public class Contact extends AppCompatActivity {
                             firstName = jsonArray.getJSONObject(i).getString("FirstName");
                             lastName = jsonArray.getJSONObject(i).getString("LastName");
                             spouse = jsonArray.getJSONObject(i).getString("Spouse");
-                            SreetAddress = jsonArray.getJSONObject(i).getString("StreetAddress");
+                            StreetAddress = jsonArray.getJSONObject(i).getString("StreetAddress");
                             CityState = jsonArray.getJSONObject(i).getString("CityState");
                             ZipCode = jsonArray.getJSONObject(i).getString("ZipCode");
                             PrimaryContactNumber = jsonArray.getJSONObject(i).getString("PrimNum");
@@ -225,7 +226,7 @@ public class Contact extends AppCompatActivity {
                             final String finalLastName = lastName;
                             final String finalMbrStatus = mbrStatus;
                             final String finalSpouse = spouse;
-                            final String finalSreetAddress = SreetAddress;
+                            final String finalStreetAddress = StreetAddress;
                             final String finalCityState = CityState;
                             final String finalZipCode = ZipCode;
                             final String finalPrimaryContactNumber = PrimaryContactNumber;
@@ -235,31 +236,32 @@ public class Contact extends AppCompatActivity {
 
                             final String finalYearTurnedActive = yearTurnedActive;
                             final String finalSpouse1 = spouse;
+
+                            final TextView tvMoreInfo = findViewById(R.id.tv_more_info);
+                            final TextView tvBack = findViewById(R.id.tv_back);
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    nameTV.setText(finalFirstName.concat(" " + finalLastName));
-                                    mbrStatusTV.setText(finalMbrStatus);
-                                    spouseTV.setText(finalSpouse);
-                                    addressTV.setText(finalSreetAddress.concat(",\n" + finalCityState + ", " + " " + finalZipCode));
-                                    primaryContactTV.setText(finalPrimaryContactNumber);
-                                    secondaryContactTV.setText(finalSecondaryContactNumber);
-                                    emailTV.setText(finalEmail);
-
-                                    btnEmail = findViewById(R.id.btn_email);
-                                    btnCall = findViewById(R.id.btn_call);
-                                    btnText = findViewById(R.id.btn_text);
-
-                                    TextView tvMoreInfo = findViewById(R.id.tv_more_info);
-                                    final TextView tvBack = findViewById(R.id.tv_back);
-                                    final TextView tvEdit = findViewById(R.id.tv_edit);
-                                    final EditText editText;
-                                    AlertDialog alertDialog = null;
-                                    final AlertDialog.Builder builder;
-                                    builder = new AlertDialog.Builder(new ContextThemeWrapper(Contact.this, R.style.myDialog));
-                                    editText = new EditText(getApplicationContext());
-
                                     if (finalEmail.equals(loginEmail)) {
+                                        Log.d(TAG, "run: finalFirstName: " + finalFirstName);
+                                        nameTV.setText(finalFirstName.concat(" " + finalLastName));
+                                        mbrStatusTV.setText(finalMbrStatus);
+                                        spouseTV.setText(finalSpouse);
+                                        addressTV.setText(finalStreetAddress.concat(",\n" + finalCityState + ", " + " " + finalZipCode));
+                                        primaryContactTV.setText(finalPrimaryContactNumber);
+                                        secondaryContactTV.setText(finalSecondaryContactNumber);
+                                        emailTV.setText(finalEmail);
+
+                                        btnEmail = findViewById(R.id.btn_email);
+                                        btnCall = findViewById(R.id.btn_call);
+                                        btnText = findViewById(R.id.btn_text);
+
+                                        TextView tvMoreInfo = findViewById(R.id.tv_more_info);
+                                        final TextView tvBack = findViewById(R.id.tv_back);
+                                        final TextView tvEdit = findViewById(R.id.tv_edit);
+                                        tvEdit.setText("Edit");
+
                                         final int nameId = nameTV.getId();
                                         final int spouseId = spouseTV.getId();
                                         final int addressId = addressTV.getId();
@@ -267,62 +269,166 @@ public class Contact extends AppCompatActivity {
                                         final int secId = secondaryContactTV.getId();
                                         final int emailId = emailTV.getId();
 
-                                        //----!!!!!!---- Update Date begins ----!!!!!!----
-                                        //no action is attached to this update, so add it within an onclicklistener
-                                        String url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/update.php";
 
-                                        List<NameValuePair> params = new ArrayList<NameValuePair>();
-                                        params.add(new BasicNameValuePair("ID", userID));
-                                        params.add(new BasicNameValuePair("Spouse", finalSpouse));
-//                                        params.add(new BasicNameValuePair("StreetAddress", finalSreetAddress));
-                                        params.add(new BasicNameValuePair("PrimNum", finalPrimaryContactNumber));
-                                        params.add(new BasicNameValuePair("SecNum", finalSecondaryContactNumber));
 
-                                        //app will crash once you uncomment this
-//                                        String resultServer = getHttpPost(url, params);
-//                                        Log.d(TAG, "run: resultserver: " + resultServer);
+                                        AlertDialog alertDialog = null;
+                                        final AlertDialog.Builder builder;
+                                        builder = new AlertDialog.Builder(Contact.this);
+                                        View viewAD = getLayoutInflater().inflate(R.layout.dialog_general, null);
 
-                                        // !!!!!!!!!!!!! UPDATE ENDS !!!!!!!!!!!!!!!
-
-                                        tvEdit.setText("Edit");
-                                        builder.setTitle("Edit Fields");
-                                        builder.setView(editText);
-                                        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                                        final TextView adTitle = viewAD.findViewById(R.id.genTitle);
+                                        final EditText etGen = viewAD.findViewById(R.id.etGen);
+                                        builder.setView(viewAD)
+                                                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialogInterface, int i) {
-                                                        if (viewId_placeholder == nameId) {
-                                                            nameTV.setText(editText.getText());
-                                                        }
+                                                        //this will update the data
+                                                        //gets the id of the textview
+                                                        //viewId_placeholder is set to the id of the textview that is clicked
+                                                        //so each if statement says "if this was the textview that had been clicked, do this: "
+                                                        Log.d(TAG, "onClick: i: " + i);
                                                         if (viewId_placeholder == spouseId) {
-                                                            spouseTV.setText(editText.getText());
-                                                        }
-                                                        if (viewId_placeholder == addressId) {
-                                                            /** FIX THIS _____
-                                                            builder.setTitle("Edit Street Address");
-                                                            alertDialog.show();
-                                                            builder.setTitle("Edit City and State");
-                                                            alertDialog.show();
-                                                            builder.setTitle("Edit Zipcode");
-                                                            addressTV.setText(editText.getText());
-                                                             */
+                                                            spouseTV.setText(etGen.getText());
+                                                            udSpouse = etGen.getText().toString();
+                                                            if (udFN == null) {
+                                                                udFN = finalFirstName;
+                                                            }
+                                                            if (udLN == null) {
+                                                                udLN = finalLastName;
+                                                            }
+                                                            if (udSpouse == null) {
+                                                                udSpouse = finalSpouse;
+                                                            }
+                                                            if (udCAS == null) {
+                                                                udCAS = finalCityState;
+                                                            }
+                                                            if (udPrim == null) {
+                                                                udPrim = finalPrimaryContactNumber;
+                                                            }
+                                                            if (udSec == null) {
+                                                                udSec = finalSecondaryContactNumber;
+                                                            }
+                                                            if (udZip == null) {
+                                                                udZip = finalZipCode;
+                                                            }
+                                                            try {
+                                                                SaveData(userID, loginEmail, udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec);
+                                                            } catch (InterruptedException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                            Toast.makeText(getApplicationContext(), "udFN: " + udFN + "; udLN: " + udLN + "; udSpouse: " +udSpouse + "; udCAS: " +udCAS + "; udPrim: " +
+                                                                    udPrim + "; udSec: " +udSec+ "; udZip: " + udZip, Toast.LENGTH_LONG).show();
                                                         }
                                                         if (viewId_placeholder == primId) {
-                                                            primaryContactTV.setText(editText.getText());
+                                                            primaryContactTV.setText(etGen.getText());
+                                                            udPrim = etGen.getText().toString();
+                                                            if (udFN == null) {
+                                                                udFN = finalFirstName;
+                                                            }
+                                                            if (udLN == null) {
+                                                                udLN = finalLastName;
+                                                            }
+                                                            if (udSpouse == null) {
+                                                                udSpouse = finalSpouse;
+                                                            }
+                                                            if (udCAS == null) {
+                                                                udCAS = finalCityState;
+                                                            }
+                                                            if (udPrim == null) {
+                                                                udPrim = finalPrimaryContactNumber;
+                                                            }
+                                                            if (udSec == null) {
+                                                                udSec = finalSecondaryContactNumber;
+                                                            }
+                                                            if (udZip == null) {
+                                                                udZip = finalZipCode;
+                                                            }
+                                                            try {
+                                                                SaveData(userID, loginEmail, udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec);
+                                                            } catch (InterruptedException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                            Toast.makeText(getApplicationContext(), "udFN: " + udFN + "; udLN: " + udLN + "; udSpouse: " +udSpouse + "; udCAS: " +udCAS + "; udPrim: " +
+                                                                    udPrim + "; udSec: " +udSec+ "; udZip: " + udZip, Toast.LENGTH_LONG).show();
                                                         }
                                                         if (viewId_placeholder == secId) {
-                                                            secondaryContactTV.setText(editText.getText());
+                                                            secondaryContactTV.setText(etGen.getText());
+                                                            udSec = etGen.getText().toString();
+                                                            if (udFN == null) {
+                                                                udFN = finalFirstName;
+                                                            }
+                                                            if (udLN == null) {
+                                                                udLN = finalLastName;
+                                                            }
+                                                            if (udSpouse == null) {
+                                                                udSpouse = finalSpouse;
+                                                            }
+                                                            if (udCAS == null) {
+                                                                udCAS = finalCityState;
+                                                            }
+                                                            if (udPrim == null) {
+                                                                udPrim = finalPrimaryContactNumber;
+                                                            }
+                                                            if (udSec == null) {
+                                                                udSec = finalSecondaryContactNumber;
+                                                            }
+                                                            if (udZip == null) {
+                                                                udZip = finalZipCode;
+                                                            }
+                                                            try {
+                                                                SaveData(userID, loginEmail, udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec);
+                                                            } catch (InterruptedException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                            Toast.makeText(getApplicationContext(), "udFN: " + udFN + "; udLN: " + udLN + "; udSpouse: " +udSpouse + "; udCAS: " +udCAS + "; udPrim: " +
+                                                                            udPrim + "; udSec: " +udSec+ "; udZip: " + udZip, Toast.LENGTH_LONG).show();
+
+
                                                         }
-                                                        if (viewId_placeholder == emailId) {
-                                                            //
-                                                        }
+//                                                        String postFN = firstName;
+//                                                        String postLN = nameTV.getText().toString();
+//                                                        String postFN = nameTV.getText().toString();
+//                                                        String postFN = nameTV.getText().toString();
+//                                                        String postFN = nameTV.getText().toString();
+//                                                        String postFN = nameTV.getText().toString();
+//                                                        String postFN = nameTV.getText().toString();
+//                                                        SaveData();
+
                                                     }
                                                 })
                                                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialogInterface, int i) {
-
+                                                        return;
                                                     }
                                                 });
+
+                                        alertDialog = builder.create();
+
+                                        //set all the edit texts and buttons
+
+                                        //----!!!!!!---- Update Date begins ----!!!!!!----
+                                        //no action is attached to this update, so add it within an onclicklistener
+                                        String url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/update.php";
+
+                                        List<NameValuePair> params = new ArrayList<NameValuePair>();
+                                        params.add(new BasicNameValuePair("userID", userID));
+                                        params.add(new BasicNameValuePair("userID", finalEmail));
+                                        params.add(new BasicNameValuePair("spouse", finalSpouse));
+                                        params.add(new BasicNameValuePair("streetAddress", finalStreetAddress));
+                                        params.add(new BasicNameValuePair("primNum", finalPrimaryContactNumber));
+                                        params.add(new BasicNameValuePair("secNum", finalSecondaryContactNumber));
+
+//                                        app will crash once you uncomment this: PROBLEM WITH THE URL or PARAMS?????
+                                        String resultServer = null;
+                                        try {
+                                            resultServer = getHttpPost(url, params);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                        Log.d(TAG, "run: resultserver: " + resultServer);
+
+                                        // !!!!!!!!!!!!! UPDATE ENDS !!!!!!!!!!!!!!!
 
 //                                        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "SAVE TEXT", new DialogInterface.OnClickListener() {
 //                                            @Override
@@ -338,20 +444,73 @@ public class Contact extends AppCompatActivity {
                                             }
                                         });
 
-                                        alertDialog = builder.create();
-
                                         //all other textviews.setOnCliCkListener(editFields);
 
-                                        final AlertDialog finalAlertDialog = alertDialog;
+                                        //updated variables
+
+
+                                        final AlertDialog finalGenAD = alertDialog;
                                         View.OnClickListener editFields = new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
+                                                //need to indicate which alert dialog needs to be shown: firstName or LastName? City or State or Zip?
                                                 int viewId = view.getId();
+                                                int z = 0;
 
                                                 if (viewId == nameTV.getId()) {
                                                     viewId_placeholder = viewId;
-                                                    finalAlertDialog.show();
-                                                    editText.setText(nameTV.getText());
+                                                    AlertDialog adName = null;
+                                                    AlertDialog.Builder builderName;
+                                                    builderName = new AlertDialog.Builder(Contact.this);
+                                                    View viewName = getLayoutInflater().inflate(R.layout.dialog_name, null);
+                                                    final EditText etFN = viewName.findViewById(R.id.etFirstName);
+                                                    final EditText etLN = viewName.findViewById(R.id.etLastName);
+                                                    Log.d(TAG, "onClick: etFN: " + etFN);
+                                                    builderName.setView(viewName)
+                                                        .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                                udFN = etFN.getText().toString();
+                                                                udLN = etLN.getText().toString();
+                                                                if (udAddress == null) {
+                                                                    udAddress = finalStreetAddress;
+                                                                }
+                                                                if (udSpouse == null) {
+                                                                    udSpouse = finalSpouse;
+                                                                }
+                                                                if (udCAS == null) {
+                                                                    udCAS = finalCityState;
+                                                                }
+                                                                if (udPrim == null) {
+                                                                    udPrim = finalPrimaryContactNumber;
+                                                                }
+                                                                if (udSec == null) {
+                                                                    udSec = finalSecondaryContactNumber;
+                                                                }
+                                                                if (udZip == null) {
+                                                                    udZip = finalZipCode;
+                                                                }
+                                                                try {
+                                                                    SaveData(userID, loginEmail, udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec);
+                                                                } catch (InterruptedException e) {
+                                                                    e.printStackTrace();
+                                                                }
+                                                                nameTV.setText(udFN.concat(" " + udLN));
+                                                                Toast.makeText(getApplicationContext(), "udFN: " + udFN + "; udLN: " + udLN + "; udSpouse: " +udSpouse + "; udCAS: " +udCAS + "; udPrim: " +
+                                                                        udPrim + "; udSec: " +udSec+ "; udZip: " + udZip, Toast.LENGTH_LONG).show();
+                                                            }})
+                                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                            }
+                                                    });
+                                                    adName = builderName.create();
+                                                    adName.show();
+
+
+                                                    etFN.setText(finalFirstName);
+                                                    etLN.setText(finalLastName);
                                                 }
                                                 if (viewId == mbrStatusTV.getId()) {
                                                     viewId_placeholder = viewId;
@@ -360,23 +519,79 @@ public class Contact extends AppCompatActivity {
                                                 }
                                                 if (viewId == spouseTV.getId()) {
                                                     viewId_placeholder = viewId;
-                                                    finalAlertDialog.show();
-                                                    editText.setText(spouseTV.getText());
+                                                    finalGenAD.show();
+                                                    etGen.setText(finalSpouse);
+                                                    adTitle.setText("Edit Spouse Name");
+//                                                    etAlertDialog.setText(spouseTV.getText());
                                                 }
                                                 if (viewId == addressTV.getId()) {
                                                     viewId_placeholder = viewId;
-                                                    finalAlertDialog.show();
-                                                    editText.setText(addressTV.getText());
+                                                    AlertDialog adAddress = null;
+                                                    AlertDialog.Builder builderAddress;
+                                                    builderAddress = new AlertDialog.Builder(Contact.this);
+                                                    View viewAd = getLayoutInflater().inflate(R.layout.dialog_address, null);
+                                                    final EditText etStreet = viewAd.findViewById(R.id.etStreet);
+                                                    EditText etCAS = viewAd.findViewById(R.id.etCityAndState);
+                                                    EditText etZip = viewAd.findViewById(R.id.etZip);
+                                                    etStreet.setText(finalStreetAddress);
+                                                    etCAS.setText(finalCityState);
+                                                    etZip.setText(finalZipCode);
+
+                                                    builderAddress.setView(viewAd);
+                                                    builderAddress.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(DialogInterface dialogInterface, int i) {
+                                                                    udAddress = etStreet.getText().toString();
+                                                                    if (udFN == null) {
+                                                                        udFN = finalFirstName;
+                                                                    }
+                                                                    if (udLN == null) {
+                                                                        udLN = finalLastName;
+                                                                    }
+                                                                    if (udSpouse == null) {
+                                                                        udSpouse = finalSpouse;
+                                                                    }
+                                                                    if (udCAS == null) {
+                                                                        udCAS = finalCityState;
+                                                                    }
+                                                                    if (udPrim == null) {
+                                                                        udPrim = finalPrimaryContactNumber;
+                                                                    }
+                                                                    if (udSec == null) {
+                                                                        udSec = finalSecondaryContactNumber;
+                                                                    }
+                                                                    if (udZip == null) {
+                                                                        udZip = finalZipCode;
+                                                                    }
+                                                                    try {
+                                                                        SaveData(userID, loginEmail, udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec);
+                                                                    } catch (InterruptedException e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                    addressTV.setText(udAddress.concat("\n" + udCAS + ", " + " " + udZip));
+                                                                    Toast.makeText(getApplicationContext(), "udFN: " + udFN + "; udLN: " + udLN + "; udSpouse: " +udSpouse + "; udCAS: " +udCAS + "; udPrim: " +
+                                                                            udPrim + "; udSec: " +udSec+ "; udZip: " + udZip, Toast.LENGTH_LONG).show();
+                                                                }})
+                                                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(DialogInterface dialogInterface, int i) {
+                                                                    return;
+                                                                }
+                                                            });
+                                                    adAddress = builderAddress.create();
+                                                    adAddress.show();
                                                 }
                                                 if (viewId == primaryContactTV.getId()) {
                                                     viewId_placeholder = viewId;
-                                                    finalAlertDialog.show();
-                                                    editText.setText(primaryContactTV.getText());
+                                                    finalGenAD.show();
+                                                    etGen.setText(finalPrimaryContactNumber);
+                                                    adTitle.setText("Edit Primary Contact Number");
                                                 }
                                                 if (viewId == secondaryContactTV.getId()) {
                                                     viewId_placeholder = viewId;
-                                                    finalAlertDialog.show();
-                                                    editText.setText(secondaryContactTV.getText());
+                                                    finalGenAD.show();
+                                                    etGen.setText(finalSecondaryContactNumber);
+                                                    adTitle.setText("Edit Secondary Contact Number");
                                                 }
                                                 if (viewId == emailTV.getId()) {
                                                     viewId_placeholder = viewId;
@@ -475,21 +690,6 @@ public class Contact extends AppCompatActivity {
                             intent.putExtra("json_data", json_string);
                         }
                     }
-
-//                    while(count <= jsonArray.length()) {
-//                        //if (userID ==)
-//                        JO = jsonArray.getJSONObject(count);
-//                        name = JO.getString("firstName").concat(" " + JO.getString("lastName"));
-//                        email = JO.getString("email");
-//                        mobile = JO.getString("mobile");
-//                        mbrStatus = JO.getString("mbrStatus");
-//
-////                        Contacts contact = new Contacts(name, email, mobile, mbrStatus);
-////                        mContactAdapter.add(contact);
-//
-//                        count++;
-//                    }
-
                     bufferedReader.close();
                     inputStream.close();
                     httpURLConnection.disconnect();
@@ -508,7 +708,7 @@ public class Contact extends AppCompatActivity {
             return null;
         }
 
-        public boolean SaveData(String firstName, String lastName, String spouse, String streetAddress, String primNum, String secNum) {
+        public boolean SaveData(String uID, String email, String fName, String lName, String spouse, String streetAddress, String CAS, String zipCode, String primNum, String secNum) throws InterruptedException {
             List<NameValuePair> params = new ArrayList<NameValuePair>();
 //            final TextView txtUserID = (TextView)findViewById(R.id.txtUserID);
 //            final TextView txtAppointmentID = (TextView)findViewById(R.id.txtAppointmentID);
@@ -524,12 +724,16 @@ public class Contact extends AppCompatActivity {
             ad.setPositiveButton("Close", null);
 
             String url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/update.php";
-            params.add(new BasicNameValuePair("Spouse", spouse));
-            params.add(new BasicNameValuePair("FirstName", firstName));
-            params.add(new BasicNameValuePair("LastName", lastName));
-            params.add(new BasicNameValuePair("StreetAddress", streetAddress));
-            params.add(new BasicNameValuePair("PrimNum", primNum));
-            params.add(new BasicNameValuePair("SecNum", secNum));
+            params.add(new BasicNameValuePair("userID", uID));
+            params.add(new BasicNameValuePair("email", email));
+            params.add(new BasicNameValuePair("firstName", fName));
+            params.add(new BasicNameValuePair("lastName", lName));
+            params.add(new BasicNameValuePair("spouse", spouse));
+            params.add(new BasicNameValuePair("streetAddress", streetAddress));
+            params.add(new BasicNameValuePair("CAS", CAS));
+            params.add(new BasicNameValuePair("zipCode", zipCode));
+            params.add(new BasicNameValuePair("primNum", primNum));
+            params.add(new BasicNameValuePair("secNum", secNum));
 
             String resultServer  = getHttpPost(url,params);
             Log.d(TAG, "resultServer - updateData: " + resultServer);
@@ -551,8 +755,10 @@ public class Contact extends AppCompatActivity {
             // Prepare Save Data
             if(strStatusID.equals("0"))
             {
-                ad.setMessage(strMessage);
-                ad.show();
+//                ad.setMessage(strMessage);
+//                ad.show();
+                Toast.makeText(Contact.this, "Update not successful", Toast.LENGTH_SHORT).show();
+
                 return false;
             }
             else
@@ -563,35 +769,48 @@ public class Contact extends AppCompatActivity {
             return true;
         }
 
-        public String getHttpPost(String url,List<NameValuePair> params) {
-            StringBuilder str = new StringBuilder();
-            HttpClient client = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost(url);
+        public String getHttpPost(String strUrl, final List<NameValuePair> params) throws InterruptedException {
+            Log.d(TAG, "getHttpPost: starts");
+            final String url = strUrl;
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    HttpClient client = new DefaultHttpClient();
+                    HttpPost httpPost = new HttpPost(url);
+                    Log.d(TAG, "run: works");
+                    str = new StringBuilder();
 
-            try {
-                httpPost.setEntity(new UrlEncodedFormEntity(params));
-                HttpResponse response = client.execute(httpPost);
-                StatusLine statusLine = response.getStatusLine();
-                int statusCode = statusLine.getStatusCode();
-                if (statusCode == 200) { // Status OK
-                    HttpEntity entity = response.getEntity();
-                    InputStream content = entity.getContent();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(content));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        str.append(line);
+                    try {
+                        httpPost.setEntity(new UrlEncodedFormEntity(params));
+                        //problem starts here
+                        HttpResponse response = client.execute(httpPost);
+                        StatusLine statusLine = response.getStatusLine();
+                        int statusCode = statusLine.getStatusCode();
+                        if (statusCode == 200) { // Status OK
+                            HttpEntity entity = response.getEntity();
+                            InputStream content = entity.getContent();
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                str.append(line);
+                            }
+                        } else {
+                            Log.e("Log", "Failed to download result..");
+                        }
+                        Log.d(TAG, "run: str: " + str);
+                    } catch (ClientProtocolException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                } else {
-                    Log.e("Log", "Failed to download result..");
                 }
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            };
+            Thread thread = new Thread(runnable);
+            thread.start();
+            thread.join();
+            Log.d(TAG, "getHttpPost: str: " + str);
             return str.toString();
         }
-
 
         @Override
         protected void onPreExecute() {

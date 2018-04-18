@@ -12,12 +12,31 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MoreInfo extends AppCompatActivity {
     private static final String TAG = "MoreInfo";
     String userID, loginEmail, userEmail;
     int viewId_placeholder = 0;
+    StringBuilder str = null;
 
 
     @Override
@@ -48,29 +67,25 @@ public class MoreInfo extends AppCompatActivity {
             tvBio.setText(bio);
         }
 
-        final EditText editText;
-        final AlertDialog alertDialog;
-//                                    final AlertDialog alertDialog;
-        final AlertDialog.Builder builder;
-        builder = new AlertDialog.Builder(new ContextThemeWrapper(MoreInfo.this, R.style.myDialog));
-        editText = new EditText(getApplicationContext());
-        Log.d(TAG, "onCreate: loginEmail: " + loginEmail);
-        Log.d(TAG, "onCreate: userEmail: " + userEmail);
-
-
         if (loginEmail.equals(userEmail)) {
+            AlertDialog alertDialog = null;
+            final AlertDialog.Builder builder;
+            builder = new AlertDialog.Builder(MoreInfo.this);
+            View viewAD = getLayoutInflater().inflate(R.layout.dialog_general, null);
+
+
             TextView tvEdit = findViewById(R.id.tvEdit);
             tvEdit.setText("Edit");
             final int tvYTAId = tvYTA.getId();
             final int tvBioId = tvBio.getId();
-            tvEdit.setText("Edit");
-            builder.setTitle("Edit Fields");
-            builder.setView(editText);
-            builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            final TextView adTitle = viewAD.findViewById(R.id.genTitle);
+            final EditText etGen = viewAD.findViewById(R.id.etGen);
+            builder.setView(viewAD)
+                    .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             if (viewId_placeholder == tvBioId) {
-                                tvBio.setText(editText.getText());
+                                tvBio.setText(etGen.getText());
                             }
                             if (viewId_placeholder == tvYTAId) {
                                 //<------------------
@@ -93,6 +108,7 @@ public class MoreInfo extends AppCompatActivity {
 
             alertDialog = builder.create();
 
+            final AlertDialog finalAlertDialog = alertDialog;
             View.OnClickListener editFields = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -102,8 +118,8 @@ public class MoreInfo extends AppCompatActivity {
 
                     if (viewId == tvBioId) {
                         viewId_placeholder = viewId;
-                        alertDialog.show();
-                        editText.setText(tvBio.getText());
+                        finalAlertDialog.show();
+                        etGen.setText(tvBio.getText());
                     }
                     if (viewId == tvYTAId) {
                         viewId_placeholder = viewId;
@@ -126,5 +142,109 @@ public class MoreInfo extends AppCompatActivity {
             }
         });
 
+    }
+
+    public boolean SaveData(String uID, String email, String fName, String lName, String spouse, String streetAddress, String CAS, String zipCode, String primNum, String secNum) throws InterruptedException {
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+//            final TextView txtUserID = (TextView)findViewById(R.id.txtUserID);
+//            final TextView txtAppointmentID = (TextView)findViewById(R.id.txtAppointmentID);
+//            final EditText txtType = (EditText)findViewById(R.id.txtType);
+//            final EditText txtDate = (EditText)findViewById(R.id.txtDate);
+//            final EditText txtTime = (EditText)findViewById(R.id.txtTime);
+
+        //Dialog
+        final AlertDialog.Builder ad = new AlertDialog.Builder(getApplicationContext());
+
+        ad.setTitle("Error! ");
+        ad.setIcon(android.R.drawable.btn_star_big_on);
+        ad.setPositiveButton("Close", null);
+
+        String url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/update.php";
+        params.add(new BasicNameValuePair("userID", uID));
+        params.add(new BasicNameValuePair("email", email));
+        params.add(new BasicNameValuePair("firstName", fName));
+        params.add(new BasicNameValuePair("lastName", lName));
+        params.add(new BasicNameValuePair("spouse", spouse));
+        params.add(new BasicNameValuePair("streetAddress", streetAddress));
+        params.add(new BasicNameValuePair("CAS", CAS));
+        params.add(new BasicNameValuePair("zipCode", zipCode));
+        params.add(new BasicNameValuePair("primNum", primNum));
+        params.add(new BasicNameValuePair("secNum", secNum));
+
+        String resultServer  = getHttpPost(url,params);
+        Log.d(TAG, "resultServer - updateData: " + resultServer);
+
+        /*** Default Value ***/
+        String strStatusID = "0";
+        String strMessage = "Unknown Status!";
+
+        JSONObject c;
+        try {
+            c = new JSONObject(resultServer);
+            strStatusID = c.getString("StatusID");
+            strMessage = c.getString("Message");
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        // Prepare Save Data
+        if(strStatusID.equals("0"))
+        {
+//                ad.setMessage(strMessage);
+//                ad.show();
+            Toast.makeText(MoreInfo.this, "Update not successful", Toast.LENGTH_SHORT).show();
+
+            return false;
+        }
+        else
+        {
+            Toast.makeText(MoreInfo.this, "Update Data Successfully", Toast.LENGTH_SHORT).show();
+        }
+
+        return true;
+    }
+
+    public String getHttpPost(String strUrl, final List<NameValuePair> params) throws InterruptedException {
+        Log.d(TAG, "getHttpPost: starts");
+        final String url = strUrl;
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                HttpClient client = new DefaultHttpClient();
+                HttpPost httpPost = new HttpPost(url);
+                Log.d(TAG, "run: works");
+                str = new StringBuilder();
+
+                try {
+                    httpPost.setEntity(new UrlEncodedFormEntity(params));
+                    //problem starts here
+                    HttpResponse response = client.execute(httpPost);
+                    StatusLine statusLine = response.getStatusLine();
+                    int statusCode = statusLine.getStatusCode();
+                    if (statusCode == 200) { // Status OK
+                        HttpEntity entity = response.getEntity();
+                        InputStream content = entity.getContent();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            str.append(line);
+                        }
+                    } else {
+                        Log.e("Log", "Failed to download result..");
+                    }
+                    Log.d(TAG, "run: str: " + str);
+                } catch (ClientProtocolException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+        thread.join();
+        Log.d(TAG, "getHttpPost: str: " + str);
+        return str.toString();
     }
 }
