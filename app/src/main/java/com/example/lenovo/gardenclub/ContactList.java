@@ -116,27 +116,27 @@ public class ContactList extends AppCompatActivity {
 //        lst.setOnItemClickListener(mOnItemClickListener);
     }
 
-    AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            try {
-//                    Toast.makeText(getApplicationContext(), String.valueOf(mJSONArray.getJSONObject(i)), Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onItemClick: mJSONArray.getJSONObject(i): " + mJSONArray.getJSONObject(i).toString());
-                String json = mJSONArray.getJSONObject(i).toString();
-                intent.putExtra("json_object", json);
-                intent.putExtra("login_email", loginEmail);
-                /**
-                 * if (String.valueOf(mJSONArray.getJSONObject(i)).equals(OTHER_USER_ID_LMAO) {
-                 *      startActivity(otherActivity)
-                 *      }
-                 */
-//                startActivity(intent);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    };
+//    AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
+//        @Override
+//        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//            try {
+////                    Toast.makeText(getApplicationContext(), String.valueOf(mJSONArray.getJSONObject(i)), Toast.LENGTH_SHORT).show();
+//                Log.d(TAG, "onItemClick: mJSONArray.getJSONObject(i): " + mJSONArray.getJSONObject(i).toString());
+//                String json = mJSONArray.getJSONObject(i).toString();
+//                intent.putExtra("json_object", json);
+//                intent.putExtra("login_email", loginEmail);
+//                /**
+//                 * if (String.valueOf(mJSONArray.getJSONObject(i)).equals(OTHER_USER_ID_LMAO) {
+//                 *      startActivity(otherActivity)
+//                 *      }
+//                 */
+////                startActivity(intent);
+//
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    };
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
@@ -144,12 +144,12 @@ public class ContactList extends AppCompatActivity {
         MenuItem menuItem = menu.findItem(R.id.search_badge_ID);
         SearchView searchView = (SearchView) menuItem.getActionView();
 
-        //additional features
-//        searchView.setActivated(true);
-//        searchView.setQueryHint("Type your keyword here");
-//        searchView.onActionViewExpanded();
-//        searchView.setIconified(false);
-//        searchView.clearFocus();
+//        additional features
+        searchView.setActivated(true);
+        searchView.setQueryHint("Search for a member");
+        searchView.onActionViewExpanded();
+        searchView.setIconified(false);
+        searchView.clearFocus();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

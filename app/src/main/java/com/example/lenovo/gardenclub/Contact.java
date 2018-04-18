@@ -94,6 +94,17 @@ public class Contact extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent backIntent = new Intent(this, ContactList.class);
+        backIntent.putExtra("json_data", json_string);
+        backIntent.putExtra("login_email", loginEmail);
+        if (json_string != null) {
+            startActivity(backIntent);
+        }
+    }
+
     class BackgroundTask1 extends AsyncTask<String, Void, String> {
         String json_post, json_get;
         private static final String TAG = "BackgroundTask";
@@ -235,30 +246,26 @@ public class Contact extends AppCompatActivity {
                             final String finalBiographicalInfo = BiographicalInfo;
 
                             final String finalYearTurnedActive = yearTurnedActive;
-                            final String finalSpouse1 = spouse;
 
                             final TextView tvMoreInfo = findViewById(R.id.tv_more_info);
                             final TextView tvBack = findViewById(R.id.tv_back);
 
+                            btnEmail = findViewById(R.id.btn_email);
+                            btnCall = findViewById(R.id.btn_call);
+                            btnText = findViewById(R.id.btn_text);
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    Log.d(TAG, "run: finalFirstName: " + finalFirstName);
+                                    nameTV.setText(finalFirstName.concat(" " + finalLastName));
+                                    mbrStatusTV.setText(finalMbrStatus);
+                                    spouseTV.setText(finalSpouse);
+                                    addressTV.setText(finalStreetAddress.concat(",\n" + finalCityState + ", " + " " + finalZipCode));
+                                    primaryContactTV.setText(finalPrimaryContactNumber);
+                                    secondaryContactTV.setText(finalSecondaryContactNumber);
+                                    emailTV.setText(finalEmail);
                                     if (finalEmail.equals(loginEmail)) {
-                                        Log.d(TAG, "run: finalFirstName: " + finalFirstName);
-                                        nameTV.setText(finalFirstName.concat(" " + finalLastName));
-                                        mbrStatusTV.setText(finalMbrStatus);
-                                        spouseTV.setText(finalSpouse);
-                                        addressTV.setText(finalStreetAddress.concat(",\n" + finalCityState + ", " + " " + finalZipCode));
-                                        primaryContactTV.setText(finalPrimaryContactNumber);
-                                        secondaryContactTV.setText(finalSecondaryContactNumber);
-                                        emailTV.setText(finalEmail);
-
-                                        btnEmail = findViewById(R.id.btn_email);
-                                        btnCall = findViewById(R.id.btn_call);
-                                        btnText = findViewById(R.id.btn_text);
-
-                                        TextView tvMoreInfo = findViewById(R.id.tv_more_info);
-                                        final TextView tvBack = findViewById(R.id.tv_back);
                                         final TextView tvEdit = findViewById(R.id.tv_edit);
                                         tvEdit.setText("Edit");
 
@@ -269,11 +276,9 @@ public class Contact extends AppCompatActivity {
                                         final int secId = secondaryContactTV.getId();
                                         final int emailId = emailTV.getId();
 
-
-
                                         AlertDialog alertDialog = null;
                                         final AlertDialog.Builder builder;
-                                        builder = new AlertDialog.Builder(Contact.this);
+                                        builder = new AlertDialog.Builder(new ContextThemeWrapper(Contact.this, R.style.myDialog));
                                         View viewAD = getLayoutInflater().inflate(R.layout.dialog_general, null);
 
                                         final TextView adTitle = viewAD.findViewById(R.id.genTitle);
@@ -403,6 +408,8 @@ public class Contact extends AppCompatActivity {
                                                     }
                                                 });
 
+
+
                                         alertDialog = builder.create();
 
                                         //set all the edit texts and buttons
@@ -455,13 +462,12 @@ public class Contact extends AppCompatActivity {
                                             public void onClick(View view) {
                                                 //need to indicate which alert dialog needs to be shown: firstName or LastName? City or State or Zip?
                                                 int viewId = view.getId();
-                                                int z = 0;
 
                                                 if (viewId == nameTV.getId()) {
                                                     viewId_placeholder = viewId;
                                                     AlertDialog adName = null;
                                                     AlertDialog.Builder builderName;
-                                                    builderName = new AlertDialog.Builder(Contact.this);
+                                                    builderName = new AlertDialog.Builder(new ContextThemeWrapper(Contact.this, R.style.myDialog));
                                                     View viewName = getLayoutInflater().inflate(R.layout.dialog_name, null);
                                                     final EditText etFN = viewName.findViewById(R.id.etFirstName);
                                                     final EditText etLN = viewName.findViewById(R.id.etLastName);
@@ -528,7 +534,7 @@ public class Contact extends AppCompatActivity {
                                                     viewId_placeholder = viewId;
                                                     AlertDialog adAddress = null;
                                                     AlertDialog.Builder builderAddress;
-                                                    builderAddress = new AlertDialog.Builder(Contact.this);
+                                                    builderAddress = new AlertDialog.Builder(new ContextThemeWrapper(Contact.this, R.style.myDialog));
                                                     View viewAd = getLayoutInflater().inflate(R.layout.dialog_address, null);
                                                     final EditText etStreet = viewAd.findViewById(R.id.etStreet);
                                                     EditText etCAS = viewAd.findViewById(R.id.etCityAndState);
@@ -618,8 +624,12 @@ public class Contact extends AppCompatActivity {
                                             Intent moreInfoIntent = new Intent(getApplicationContext(), MoreInfo.class);
                                             moreInfoIntent.putExtra("bio", finalBiographicalInfo);
                                             moreInfoIntent.putExtra("YTA", finalYearTurnedActive);
+                                            moreInfoIntent.putExtra("firstName", finalFirstName);
+                                            moreInfoIntent.putExtra("lastName", finalLastName);
                                             moreInfoIntent.putExtra("login_email", loginEmail);
                                             moreInfoIntent.putExtra("user_email", finalEmail);
+                                            moreInfoIntent.putExtra("user_id", userID);
+
                                             startActivity(moreInfoIntent);
 
                                         }
@@ -645,9 +655,9 @@ public class Contact extends AppCompatActivity {
                                                 //                                          int[] grantResults)
                                                 // to handle the case where the user grants the permission. See the documentation
                                                 // for ActivityCompat#requestPermissions for more details.
-                                                Intent intent = new Intent(Intent.ACTION_DIAL);
-                                                intent.setData(Uri.parse("tel: " + finalPrimaryContactNumber));
-                                                startActivity(intent);
+                                                Intent otherCallIntent = new Intent(Intent.ACTION_DIAL);
+                                                otherCallIntent.setData(Uri.parse("tel: " + finalPrimaryContactNumber));
+                                                startActivity(otherCallIntent);
                                                 return;
                                             }
                                             startActivity(callIntent);
@@ -734,6 +744,8 @@ public class Contact extends AppCompatActivity {
             params.add(new BasicNameValuePair("zipCode", zipCode));
             params.add(new BasicNameValuePair("primNum", primNum));
             params.add(new BasicNameValuePair("secNum", secNum));
+            params.add(new BasicNameValuePair("bioUpdate", "no"));
+
 
             String resultServer  = getHttpPost(url,params);
             Log.d(TAG, "resultServer - updateData: " + resultServer);

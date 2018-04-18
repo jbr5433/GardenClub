@@ -39,8 +39,6 @@ import java.net.URLEncoder;
 //...github/gardenclub-android>git commit -m "add existing files
 //...github/gardenclub-android>git push origin master
 
-//for the webview, you can use .nextPage() == true or w/e and then get the email upon the submit button being clicked
-
 /**
  * User photo images <-----
  *
@@ -69,9 +67,9 @@ public class MainActivity extends AppCompatActivity {
         intent = new Intent(this, ContactList.class);
         setContentView(R.layout.activity_main);
 //        getSupportActionBar().hide();
-        Login = (Button) findViewById(R.id.button);
-        UsernameEt = (EditText) findViewById(R.id.et_login);
-        PasswordEt = (EditText) findViewById(R.id.et_pass);
+        Login = findViewById(R.id.button);
+        UsernameEt = findViewById(R.id.et_login);
+        PasswordEt = findViewById(R.id.et_pass);
 
         Login.setVisibility(View.GONE);
         UsernameEt.setVisibility(View.GONE);
@@ -80,13 +78,9 @@ public class MainActivity extends AppCompatActivity {
         username = UsernameEt.getText().toString();
         password = PasswordEt.getText().toString();
 
-        //
-
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = UsernameEt.getText().toString();
-                String password = PasswordEt.getText().toString();
                 String type = "login";
 
 //                StringBuilder sb = new StringBuilder();
@@ -165,9 +159,6 @@ public class MainActivity extends AppCompatActivity {
                     mWebView.setVisibility(View.GONE);
                     parseJson(view);
 //                    Login.performClick();
-//                    Login.performClick();
-//                    Login.performClick();
-//                    Login.performClick();
 //                    parseJson(view);
                     if (json_string != null) {
                         Log.d(TAG, "onPageFinished: json_string != null");
@@ -233,10 +224,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.d(TAG, "parseJson: json_string != null");
             jsonParsed = 1;
-//            Intent intent = new Intent(this, ContactList.class);
             intent.putExtra("json_data", json_string);
             Log.d(TAG, "parseJson: json_data: " + json_string);
-//            startActivity(intent);
         }
     }
 
@@ -255,7 +244,6 @@ public class MainActivity extends AppCompatActivity {
                 HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
                 InputStream inputStream = httpURLConnection.getInputStream();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
-//                writeToFile(inputStream, getApplicationContext());
                 StringBuilder stringBuilder = new StringBuilder();
                 while ((JSON_STRING = bufferedReader.readLine()) != null) {
                     stringBuilder.append(JSON_STRING+"\n");
@@ -288,55 +276,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-//            TextView textView = findViewById(R.id.textView);
-//            textView.setText(result);
-//            Log.d(TAG, "onPostExecute: s = " + s);
             json_string = result;
             Log.d(TAG, "onPostExecute: json_string: " + json_string.toString());
-//            writeToFile(json_string);
 
         }
     }
-
-
-
-    private void writeToFile(String data) {
-        final File path =
-                Environment.getExternalStoragePublicDirectory
-                        (
-                                //Environment.DIRECTORY_PICTURES
-                                Environment.DIRECTORY_DCIM + ""
-                        );
-
-        // Make sure the path directory exists.
-        if(!path.exists())
-        {
-            // Make it, if it doesn't exit
-            path.mkdirs();
-        }
-
-        final File file = new File(path, "json_data.txt");
-
-        // Save your stream, don't forget to flush() it before closing it.
-
-        try
-        {
-            file.createNewFile();
-            FileOutputStream fOut = new FileOutputStream(file);
-            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-            myOutWriter.append(data);
-
-            myOutWriter.close();
-
-            fOut.flush();
-            fOut.close();
-        }
-        catch (IOException e)
-        {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
-    }
-
-
 
 }

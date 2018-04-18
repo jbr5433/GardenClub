@@ -45,5 +45,6 @@
     <string name="year_active">Year Turned Active</string>
     <string name="dyk">Did You Know?</string>
     <string name="edit">Edit</string>
+    <string name="userNoBio">You don\'t have a bio yet. Tap here to add one</string>
 
 </resources>

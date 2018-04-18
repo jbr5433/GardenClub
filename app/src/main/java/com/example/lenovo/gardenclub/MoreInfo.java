@@ -34,7 +34,7 @@ import java.util.List;
 
 public class MoreInfo extends AppCompatActivity {
     private static final String TAG = "MoreInfo";
-    String userID, loginEmail, userEmail;
+    String userID, loginEmail, userEmail, firstName, lastName;
     int viewId_placeholder = 0;
     StringBuilder str = null;
 
@@ -47,6 +47,8 @@ public class MoreInfo extends AppCompatActivity {
         userID = getIntent().getExtras().getString("user_id");
         loginEmail = getIntent().getExtras().getString("login_email").trim();
         userEmail = getIntent().getExtras().getString("user_email").trim();
+        firstName = getIntent().getExtras().getString("firstName").trim();
+        lastName = getIntent().getExtras().getString("lastName").trim();
         setContentView(R.layout.activity_more_info);
         getSupportActionBar().hide();
 
@@ -63,16 +65,18 @@ public class MoreInfo extends AppCompatActivity {
             tvYTA.setText(YTA);
         }
 
-        if (tvBio != null) {
-            tvBio.setText(bio);
-        }
+
 
         if (loginEmail.equals(userEmail)) {
+            if (tvBio != null || bio.length() > 0) {
+                tvBio.setText(bio);
+            } else {
+                tvBio.setText(R.string.userNoBio);
+            }
             AlertDialog alertDialog = null;
             final AlertDialog.Builder builder;
-            builder = new AlertDialog.Builder(MoreInfo.this);
+            builder = new AlertDialog.Builder(new ContextThemeWrapper(MoreInfo.this, R.style.myDialog));
             View viewAD = getLayoutInflater().inflate(R.layout.dialog_general, null);
-
 
             TextView tvEdit = findViewById(R.id.tvEdit);
             tvEdit.setText("Edit");
@@ -85,7 +89,16 @@ public class MoreInfo extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             if (viewId_placeholder == tvBioId) {
-                                tvBio.setText(etGen.getText());
+                                adTitle.setText("Edit Biographical Info");
+                                String udBio = etGen.getText().toString();
+                                tvBio.setText(udBio);
+                                try {
+                                    SaveData(userID,loginEmail,udBio);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                Toast.makeText(getApplicationContext(), "userID: " + userID + "; loginEmail: " + loginEmail + "; udBio: " +udBio, Toast.LENGTH_LONG).show();
+
                             }
                             if (viewId_placeholder == tvYTAId) {
                                 //<------------------
@@ -113,8 +126,6 @@ public class MoreInfo extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     int viewId = view.getId();
-                    Log.d(TAG, "onClick: viewid: " + viewId);
-                    Log.d(TAG, "onClick: tvBioId: " + tvBioId);
 
                     if (viewId == tvBioId) {
                         viewId_placeholder = viewId;
@@ -131,6 +142,12 @@ public class MoreInfo extends AppCompatActivity {
 
             tvBio.setOnClickListener(editFields);
             tvYTA.setOnClickListener(editFields);
+        } else {
+            if (tvBio != null || bio.length() > 0) {
+                tvBio.setText(bio);
+            } else {
+                tvBio.setText(firstName + " has not added a bio yet.");
+            }
         }
 
 
@@ -144,7 +161,7 @@ public class MoreInfo extends AppCompatActivity {
 
     }
 
-    public boolean SaveData(String uID, String email, String fName, String lName, String spouse, String streetAddress, String CAS, String zipCode, String primNum, String secNum) throws InterruptedException {
+    public boolean SaveData(String uID, String email, String bio) throws InterruptedException {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
 //            final TextView txtUserID = (TextView)findViewById(R.id.txtUserID);
 //            final TextView txtAppointmentID = (TextView)findViewById(R.id.txtAppointmentID);
@@ -158,18 +175,13 @@ public class MoreInfo extends AppCompatActivity {
         ad.setTitle("Error! ");
         ad.setIcon(android.R.drawable.btn_star_big_on);
         ad.setPositiveButton("Close", null);
+        Log.d(TAG, "SaveData: bio: " + bio);
 
         String url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/update.php";
         params.add(new BasicNameValuePair("userID", uID));
         params.add(new BasicNameValuePair("email", email));
-        params.add(new BasicNameValuePair("firstName", fName));
-        params.add(new BasicNameValuePair("lastName", lName));
-        params.add(new BasicNameValuePair("spouse", spouse));
-        params.add(new BasicNameValuePair("streetAddress", streetAddress));
-        params.add(new BasicNameValuePair("CAS", CAS));
-        params.add(new BasicNameValuePair("zipCode", zipCode));
-        params.add(new BasicNameValuePair("primNum", primNum));
-        params.add(new BasicNameValuePair("secNum", secNum));
+        params.add(new BasicNameValuePair("bio", bio));
+        params.add(new BasicNameValuePair("bioUpdate", "yes"));
 
         String resultServer  = getHttpPost(url,params);
         Log.d(TAG, "resultServer - updateData: " + resultServer);
@@ -246,5 +258,14 @@ public class MoreInfo extends AppCompatActivity {
         thread.join();
         Log.d(TAG, "getHttpPost: str: " + str);
         return str.toString();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(this, Contact.class);
+        intent.putExtra("user_id", userID);
+        intent.putExtra("login_email", loginEmail);
+        startActivity(intent);
     }
 }
