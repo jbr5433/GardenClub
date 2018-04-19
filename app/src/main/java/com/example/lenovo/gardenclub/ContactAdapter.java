@@ -51,15 +51,11 @@ public class ContactAdapter extends ArrayAdapter implements Filterable {
                 String name = item.getName();
                 String uID = item.getUserID();
                 String loginEmail = item.getLoginEmail();
-
-
-                Log.d(TAG, "onItemClick: item: " + item.getName());
-                Log.d(TAG, "onItemClick: list: " + list);
-                Log.d(TAG, "onItemClick: uID: " + uID);
                 Intent intent = new Intent(adapterView.getContext(), Contact.class);
                 intent.putExtra("user_id", uID);
                 intent.putExtra("login_email", loginEmail);
                 adapterView.getContext().startActivity(intent);
+                ContactList.fa.finish();
 
             }
         }
@@ -104,7 +100,6 @@ public class ContactAdapter extends ArrayAdapter implements Filterable {
             contactHolder = (ContactHolder) row.getTag();
         }
         Contacts contact = (Contacts) this.getItem(position);
-        Log.d(TAG, "getView: contact = " + contact);
         contactHolder.tx_name.setText(contact.getName());
 //        contactHolder.tx_email.setText(contact.getEmail());
 //        contactHolder.tx_mobile.setText(contact.getMobile());
@@ -131,7 +126,6 @@ public class ContactAdapter extends ArrayAdapter implements Filterable {
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();
             Contacts current;
-            Log.d(TAG, "performFiltering: constraint: " + constraint);
 
             prevCnstrntLength = cnstrntLength;
             cnstrntLength = constraint.length();
@@ -166,7 +160,6 @@ public class ContactAdapter extends ArrayAdapter implements Filterable {
                 results.count = fullList.size();
                 results.values = fullList;
             }
-            Log.d(TAG, "performFiltering: results.values: " + results.values);
             return results;
         }
 

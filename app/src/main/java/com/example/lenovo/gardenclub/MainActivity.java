@@ -167,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "onPageFinished: loginInfo = " + webAppInterface.loginInfo);
                         intent.putExtra("login_email", webAppInterface.loginInfo);
                         startActivity(intent);
+                        finish();
 
                     } else {
                         Log.d(TAG, "onPageFinished: json_string == null / jsonParsed = " + jsonParsed);

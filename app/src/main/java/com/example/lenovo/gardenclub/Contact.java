@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Parcelable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -51,14 +52,17 @@ public class Contact extends AppCompatActivity {
     int viewId_placeholder = 0;
     Button btnEmail, btnCall, btnText;
     TextView emailID;
+    static String json_string;
     JSONObject jsonObject;
-    String json, JSON_STRING, json_string, type, userID;
+    String json, JSON_STRING, type, userID;
     private static final String TAG = "Contact";
     String finalEmail = null;
     JSONObject JO;
     String SBString, loginEmail;
     StringBuilder str;
     String udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec, udBio;
+    TextView tvMoreInfo, tvBack;
+    Intent backIntent;
 
 
     public Contact() throws JSONException {
@@ -73,7 +77,13 @@ public class Contact extends AppCompatActivity {
 //        json = getIntent().getExtras().getString("json_object");
         userID = getIntent().getExtras().getString("user_id");
         loginEmail = getIntent().getExtras().getString("login_email");
+        String json_data = getIntent().getExtras().getString("json_data");
+//        Log.d(TAG, "onCreate: json_data: " + json_data); == null
+        backIntent = new Intent(this, ContactList.class);
+        backIntent.putExtra("json_data", json_data);
         getSupportActionBar().hide();
+        tvMoreInfo = findViewById(R.id.tv_more_info);
+        tvBack = findViewById(R.id.tv_back);
 
 //        try {
 ////            jsonObject = new JSONObject(json);
@@ -97,12 +107,12 @@ public class Contact extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent backIntent = new Intent(this, ContactList.class);
-        backIntent.putExtra("json_data", json_string);
+//        backIntent.putExtra("json_data", json_string);
         backIntent.putExtra("login_email", loginEmail);
-        if (json_string != null) {
+//        if (json_string != null) {
             startActivity(backIntent);
-        }
+//        }
+
     }
 
     class BackgroundTask1 extends AsyncTask<String, Void, String> {
@@ -180,8 +190,15 @@ public class Contact extends AppCompatActivity {
 //                        Log.d(TAG, "doInBackground: JSON_STRING: " + JSON_STRING["server_response"]);
                     }
 
+
                     JSONObject jsonObject = new JSONObject(String.valueOf(stringBuilder));
                     JSONArray jsonArray = jsonObject.getJSONArray("server_response");
+
+                    Log.d(TAG, "Contact.java doInBackground: stringBuilder: " + stringBuilder);
+                    Log.d(TAG, "Contact.java doInBackground: jsonObject: " + String.valueOf(jsonObject));
+                    backIntent.putExtra("json_data", String.valueOf(jsonObject));
+                    Log.d(TAG, "Contact.java doInBackground: jsonArray: " + jsonArray);
+
 
                     String email;
                     String mbrStatus;
@@ -247,8 +264,7 @@ public class Contact extends AppCompatActivity {
 
                             final String finalYearTurnedActive = yearTurnedActive;
 
-                            final TextView tvMoreInfo = findViewById(R.id.tv_more_info);
-                            final TextView tvBack = findViewById(R.id.tv_back);
+
 
                             btnEmail = findViewById(R.id.btn_email);
                             btnCall = findViewById(R.id.btn_call);
@@ -257,7 +273,6 @@ public class Contact extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Log.d(TAG, "run: finalFirstName: " + finalFirstName);
                                     nameTV.setText(finalFirstName.concat(" " + finalLastName));
                                     mbrStatusTV.setText(finalMbrStatus);
                                     spouseTV.setText(finalSpouse);
@@ -291,7 +306,6 @@ public class Contact extends AppCompatActivity {
                                                         //gets the id of the textview
                                                         //viewId_placeholder is set to the id of the textview that is clicked
                                                         //so each if statement says "if this was the textview that had been clicked, do this: "
-                                                        Log.d(TAG, "onClick: i: " + i);
                                                         if (viewId_placeholder == spouseId) {
                                                             spouseTV.setText(etGen.getText());
                                                             udSpouse = etGen.getText().toString();
@@ -433,7 +447,6 @@ public class Contact extends AppCompatActivity {
                                         } catch (InterruptedException e) {
                                             e.printStackTrace();
                                         }
-                                        Log.d(TAG, "run: resultserver: " + resultServer);
 
                                         // !!!!!!!!!!!!! UPDATE ENDS !!!!!!!!!!!!!!!
 
@@ -471,7 +484,6 @@ public class Contact extends AppCompatActivity {
                                                     View viewName = getLayoutInflater().inflate(R.layout.dialog_name, null);
                                                     final EditText etFN = viewName.findViewById(R.id.etFirstName);
                                                     final EditText etLN = viewName.findViewById(R.id.etLastName);
-                                                    Log.d(TAG, "onClick: etFN: " + etFN);
                                                     builderName.setView(viewName)
                                                         .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                                                             @Override
@@ -629,18 +641,13 @@ public class Contact extends AppCompatActivity {
                                             moreInfoIntent.putExtra("login_email", loginEmail);
                                             moreInfoIntent.putExtra("user_email", finalEmail);
                                             moreInfoIntent.putExtra("user_id", userID);
-
                                             startActivity(moreInfoIntent);
+                                            finish();
 
                                         }
                                     });
 
-                                    tvBack.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            onBackPressed();
-                                        }
-                                    });
+
 
                                     btnCall.setOnClickListener(new View.OnClickListener() {
                                         @Override
@@ -670,8 +677,6 @@ public class Contact extends AppCompatActivity {
 
 //                String email = String.valueOf(emailID.getText());
 
-                                            Log.d(TAG, "onClick: finalEmail: " + finalEmail);
-
                                             Intent emailIntent = new Intent(Intent.ACTION_SEND);
                                             emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{finalEmail});
 //                                            emailIntent.putExtra(Intent.EXTRA_CC, new String[]{"swanandinaction@gmail.com"});
@@ -688,7 +693,6 @@ public class Contact extends AppCompatActivity {
                                     btnText.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
-                                            Log.d(TAG, "onClick: clicked ae");
                                             Intent sendIntent = new Intent(Intent.ACTION_VIEW);
                                             sendIntent.setData(Uri.parse("sms: " + finalPrimaryContactNumber));
                                             startActivity(sendIntent);
@@ -697,7 +701,8 @@ public class Contact extends AppCompatActivity {
                                 }
                             });
                             Intent intent = new Intent(String.valueOf(this));
-                            intent.putExtra("json_data", json_string);
+//                            intent.putExtra("json_data", json_string);
+                            Log.d(TAG, "Contact.java doInBackground: json_string in oncreate: " + json_string);
                         }
                     }
                     bufferedReader.close();
@@ -748,7 +753,6 @@ public class Contact extends AppCompatActivity {
 
 
             String resultServer  = getHttpPost(url,params);
-            Log.d(TAG, "resultServer - updateData: " + resultServer);
 
             /*** Default Value ***/
             String strStatusID = "0";
@@ -782,14 +786,12 @@ public class Contact extends AppCompatActivity {
         }
 
         public String getHttpPost(String strUrl, final List<NameValuePair> params) throws InterruptedException {
-            Log.d(TAG, "getHttpPost: starts");
             final String url = strUrl;
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
                     HttpClient client = new DefaultHttpClient();
                     HttpPost httpPost = new HttpPost(url);
-                    Log.d(TAG, "run: works");
                     str = new StringBuilder();
 
                     try {
@@ -809,7 +811,6 @@ public class Contact extends AppCompatActivity {
                         } else {
                             Log.e("Log", "Failed to download result..");
                         }
-                        Log.d(TAG, "run: str: " + str);
                     } catch (ClientProtocolException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
@@ -820,7 +821,6 @@ public class Contact extends AppCompatActivity {
             Thread thread = new Thread(runnable);
             thread.start();
             thread.join();
-            Log.d(TAG, "getHttpPost: str: " + str);
             return str.toString();
         }
 
@@ -843,15 +843,18 @@ public class Contact extends AppCompatActivity {
 //            textView.setText(result);
 //            Log.d(TAG, "onPostExecute: s = " + s);
             json_string = result;
-//            Log.d(TAG, "onPostExecute: json_string: " + json_string.toString());
+            tvBack.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onBackPressed();
+                }
+            });
 //            writeToFile(json_string);
             JSONObject jsonObject = null;
-            Log.d(TAG, "onPostExecute: result:: " + result);
             try {
                 jsonObject = new JSONObject(String.valueOf(SBString));
                 JSONArray jsonArray = jsonObject.getJSONArray("server_response");
                 String sssss = jsonObject.getString("userID");
-                Log.d(TAG, "onPostExecute: :::::" + sssss);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -860,12 +863,16 @@ public class Contact extends AppCompatActivity {
 
     public void parseJson(View view) {
         new BackgroundTask1().execute();
+        Log.d(TAG, "Contact.java parseJson: json_string: ");
         if (json_string == null) {
 //            Toast.makeText(getApplicationContext(), "First Get JSON", Toast.LENGTH_LONG).show();
 
         } else {
+//            backIntent.putExtra("json_data", json_string);
             Intent intent = new Intent(this, ContactList.class);
             intent.putExtra("json_data", json_string);
+            Log.d(TAG, "Contact.java parseJson: json_string" + json_string);
+
             startActivity(intent);
         }
     }

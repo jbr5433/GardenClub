@@ -150,8 +150,6 @@ public class MoreInfo extends AppCompatActivity {
             }
         }
 
-
-
         tvBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -267,5 +265,6 @@ public class MoreInfo extends AppCompatActivity {
         intent.putExtra("user_id", userID);
         intent.putExtra("login_email", loginEmail);
         startActivity(intent);
+        finish();
     }
 }

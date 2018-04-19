@@ -54,6 +54,7 @@ public class ContactList extends AppCompatActivity {
     JSONArray mJSONArray;
     ContactAdapter mContactAdapter;
     Intent intent;
+    public static AppCompatActivity fa;
 
 //    SearchView mSearchView = (SearchView) findViewById(R.id.searchView);
 
@@ -64,6 +65,7 @@ public class ContactList extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        fa = this;
         setContentView(R.layout.activity_contact_list);
         intent = new Intent(this, Contact.class);
 
@@ -78,8 +80,7 @@ public class ContactList extends AppCompatActivity {
 
         json_string = getIntent().getExtras().getString("json_data");
         loginEmail = getIntent().getExtras().getString("login_email").trim();
-        Log.d(TAG, "onCreate: json_string from intent: " + json_string);
-        Log.d(TAG, "onCreate: login_email from intent: " + getIntent().getExtras().getString("login_email").trim());
+        intent.putExtra("json_data", json_string);
 
         try {
 
@@ -91,7 +92,7 @@ public class ContactList extends AppCompatActivity {
             while(count <= mJSONArray.length()) {
                 JO = mJSONArray.getJSONObject(count);
                 name = JO.getString("FirstName").concat(" " + JO.getString("LastName"));
-                email = JO.getString("Email");
+                email = JO.getString("EmailAddress");
                 mobile = JO.getString("PrimNum");
                 mbrStatus = JO.getString("MbrStatus");
                 userID = JO.getString("ID");
