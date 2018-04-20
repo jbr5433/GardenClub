@@ -94,7 +94,7 @@ public class ContactList extends AppCompatActivity {
                 name = JO.getString("FirstName").concat(" " + JO.getString("LastName"));
                 email = JO.getString("EmailAddress");
                 mobile = JO.getString("PrimNum");
-                mbrStatus = JO.getString("MbrStatus");
+                mbrStatus = JO.getString("Status");
                 userID = JO.getString("ID");
 
                 Contacts contact = new Contacts(name, email, mobile, mbrStatus, userID, loginEmail);

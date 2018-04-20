@@ -45,6 +45,7 @@ public class MoreInfo extends AppCompatActivity {
         Intent intent = new Intent(this, MoreInfo.class);
         intent.getExtras();
         userID = getIntent().getExtras().getString("user_id");
+        Log.d(TAG, "onCreate: userID: " + userID);
         loginEmail = getIntent().getExtras().getString("login_email").trim();
         userEmail = getIntent().getExtras().getString("user_email").trim();
         firstName = getIntent().getExtras().getString("firstName").trim();
@@ -175,7 +176,7 @@ public class MoreInfo extends AppCompatActivity {
         ad.setPositiveButton("Close", null);
         Log.d(TAG, "SaveData: bio: " + bio);
 
-        String url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/update.php";
+        String url = "http://capefeargardenclub.org/cfgcTestingJSON/update.php";
         params.add(new BasicNameValuePair("userID", uID));
         params.add(new BasicNameValuePair("email", email));
         params.add(new BasicNameValuePair("bio", bio));
