@@ -34,7 +34,7 @@ import java.util.List;
 
 public class MoreInfo extends AppCompatActivity {
     private static final String TAG = "MoreInfo";
-    String userID, loginEmail, userEmail, firstName, lastName;
+    String userID, loginEmail, userEmail, firstName, lastName, bio;
     int viewId_placeholder = 0;
     StringBuilder str = null;
 
@@ -45,6 +45,7 @@ public class MoreInfo extends AppCompatActivity {
         Intent intent = new Intent(this, MoreInfo.class);
         intent.getExtras();
         userID = getIntent().getExtras().getString("user_id");
+        Log.d(TAG, "onCreate: userID: " + userID);
         loginEmail = getIntent().getExtras().getString("login_email").trim();
         userEmail = getIntent().getExtras().getString("user_email").trim();
         firstName = getIntent().getExtras().getString("firstName").trim();
@@ -55,7 +56,9 @@ public class MoreInfo extends AppCompatActivity {
         JSONObject JO;
 
         String YTA = getIntent().getExtras().getString("YTA");
-        String bio = getIntent().getExtras().getString("bio");
+        bio = getIntent().getExtras().getString("bio");
+        Log.d(TAG, "MoreInfo onCreate: bio: " + bio);
+
 
         final TextView tvYTA = findViewById(R.id.tv_yta);
         final TextView tvBio = findViewById(R.id.tv_bio);
@@ -64,8 +67,6 @@ public class MoreInfo extends AppCompatActivity {
         if (tvYTA != null) {
             tvYTA.setText(YTA);
         }
-
-
 
         if (loginEmail.equals(userEmail)) {
             if (tvBio != null || bio.length() > 0) {
@@ -89,7 +90,6 @@ public class MoreInfo extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             if (viewId_placeholder == tvBioId) {
-                                adTitle.setText("Edit Biographical Info");
                                 String udBio = etGen.getText().toString();
                                 tvBio.setText(udBio);
                                 try {
@@ -128,6 +128,7 @@ public class MoreInfo extends AppCompatActivity {
                     int viewId = view.getId();
 
                     if (viewId == tvBioId) {
+                        adTitle.setText("Edit Biographical Info");
                         viewId_placeholder = viewId;
                         finalAlertDialog.show();
                         etGen.setText(tvBio.getText());
@@ -135,7 +136,6 @@ public class MoreInfo extends AppCompatActivity {
                     if (viewId == tvYTAId) {
                         viewId_placeholder = viewId;
                         Toast.makeText(getApplicationContext(), "You cannot edit your Member Status from this application", Toast.LENGTH_LONG).show();
-
                     }
                 }
             };
@@ -156,7 +156,6 @@ public class MoreInfo extends AppCompatActivity {
                 onBackPressed();
             }
         });
-
     }
 
     public boolean SaveData(String uID, String email, String bio) throws InterruptedException {
@@ -166,8 +165,8 @@ public class MoreInfo extends AppCompatActivity {
 //            final EditText txtType = (EditText)findViewById(R.id.txtType);
 //            final EditText txtDate = (EditText)findViewById(R.id.txtDate);
 //            final EditText txtTime = (EditText)findViewById(R.id.txtTime);
-
         //Dialog
+
         final AlertDialog.Builder ad = new AlertDialog.Builder(getApplicationContext());
 
         ad.setTitle("Error! ");
@@ -175,7 +174,7 @@ public class MoreInfo extends AppCompatActivity {
         ad.setPositiveButton("Close", null);
         Log.d(TAG, "SaveData: bio: " + bio);
 
-        String url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/update.php";
+        String url = "http://capefeargardenclub.org/cfgcTestingJSON/update.php";
         params.add(new BasicNameValuePair("userID", uID));
         params.add(new BasicNameValuePair("email", email));
         params.add(new BasicNameValuePair("bio", bio));
@@ -199,19 +198,15 @@ public class MoreInfo extends AppCompatActivity {
         }
 
         // Prepare Save Data
-        if(strStatusID.equals("0"))
-        {
+        if(strStatusID.equals("0")) {
 //                ad.setMessage(strMessage);
 //                ad.show();
             Toast.makeText(MoreInfo.this, "Update not successful", Toast.LENGTH_SHORT).show();
 
             return false;
-        }
-        else
-        {
+        } else {
             Toast.makeText(MoreInfo.this, "Update Data Successfully", Toast.LENGTH_SHORT).show();
         }
-
         return true;
     }
 
@@ -263,6 +258,7 @@ public class MoreInfo extends AppCompatActivity {
         super.onBackPressed();
         Intent intent = new Intent(this, Contact.class);
         intent.putExtra("user_id", userID);
+        intent.putExtra("bio", bio);
         intent.putExtra("login_email", loginEmail);
         startActivity(intent);
         finish();

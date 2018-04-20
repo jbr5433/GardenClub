@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -60,7 +61,7 @@ public class Contact extends AppCompatActivity {
     JSONObject JO;
     String SBString, loginEmail;
     StringBuilder str;
-    String udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec, udBio;
+    String udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec, password, bio;
     TextView tvMoreInfo, tvBack;
     Intent backIntent;
 
@@ -77,6 +78,9 @@ public class Contact extends AppCompatActivity {
 //        json = getIntent().getExtras().getString("json_object");
         userID = getIntent().getExtras().getString("user_id");
         loginEmail = getIntent().getExtras().getString("login_email");
+        password = getIntent().getExtras().getString("password");
+//        bio = getIntent().getExtras().getString("bio");
+//        Log.d(TAG, "Contact.java onCreate: bio: " + bio);
         String json_data = getIntent().getExtras().getString("json_data");
 //        Log.d(TAG, "onCreate: json_data: " + json_data); == null
         backIntent = new Intent(this, ContactList.class);
@@ -116,79 +120,37 @@ public class Contact extends AppCompatActivity {
     }
 
     class BackgroundTask1 extends AsyncTask<String, Void, String> {
-        String json_post, json_get;
+        String json_post, json_get, json_url;
         private static final String TAG = "BackgroundTask";
 
 
         @Override
         protected String doInBackground(String... params) {
             type = params[0];
-            StringBuilder stringBuilder = null;
-            if (type.equals("post_info")) {
-                try {
-                    userID = params[1];
-//                String password = params[2];
-                    URL url = new URL(json_get);
-                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-
-                    httpURLConnection.setRequestMethod("POST");
-                    httpURLConnection.setDoOutput(true);
-                    httpURLConnection.setDoInput(true);
-                    OutputStream outputStream = httpURLConnection.getOutputStream();
-                    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-                    //CHANGE THIS: FirstName and LastName
-                    userID = jsonObject.getString("ID");
-                    String post_data = URLEncoder.encode("ID", "UTF-8") + "=" + URLEncoder.encode(userID, "UTF-8");
-                    bufferedWriter.write(post_data);
-                    bufferedWriter.flush();
-                    bufferedWriter.close();
-                    outputStream.close();
-                    InputStream inputStream = httpURLConnection.getInputStream();
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "iso-8859-1"));
-//                    String result="";
-//                    String line="";
-//                    while((line = bufferedReader.readLine())!= null) {
-//                        result += line;
-//                    }
-
-//                    InputStream inputStream = httpURLConnection.getInputStream();
-//                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
-//                writeToFile(inputStream, getApplicationContext());
-                    stringBuilder = new StringBuilder();
-                    while ((JSON_STRING = bufferedReader.readLine()) != null) {
-                        stringBuilder.append(JSON_STRING + "\n");
-                    }
-
-                    bufferedReader.close();
-                    inputStream.close();
-                    httpURLConnection.disconnect();
-                    return stringBuilder.toString().trim();
-
-//                    bufferedReader.close();
-//                    inputStream.close();
-//                    httpURLConnection.disconnect();
-//                    return result;
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
             if (type.equals("get_info")) {
+                HttpClient client = new DefaultHttpClient();
+                HttpPost httpPost = new HttpPost(json_url);
+                str = new StringBuilder();
+                String url = "http://capefeargardenclub.org/cfgcTestingJSON/login.php";
+                List<NameValuePair> postParams = new ArrayList<NameValuePair>();
+
+                postParams.add(new BasicNameValuePair("email", finalEmail));
+                postParams.add(new BasicNameValuePair("password", password));
+                postParams.add(new BasicNameValuePair("method", "all_json"));
                 try {
-//                String password = params[2];
-                    URL url = new URL(json_get);
-                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                    InputStream inputStream = httpURLConnection.getInputStream();
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "iso-8859-1"));
-//                writeToFile(inputStream, getApplicationContext());
-                    stringBuilder = new StringBuilder();
-                    while ((JSON_STRING = bufferedReader.readLine()) != null) {
-                        stringBuilder.append(JSON_STRING + "\n");
-//                        Log.d(TAG, "doInBackground: JSON_STRING: " + JSON_STRING["server_response"]);
-                    }
+                    httpPost.setEntity(new UrlEncodedFormEntity(postParams));
+                    //problem starts here
+                    HttpResponse response = client.execute(httpPost);
+                    StatusLine statusLine = response.getStatusLine();
+                    int statusCode = statusLine.getStatusCode();
+                    if (statusCode == 200) { // Status OK
+                        HttpEntity entity = response.getEntity();
+                        InputStream inputStream = entity.getContent();
+                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
+                        StringBuilder stringBuilder = new StringBuilder();
+                        while ((JSON_STRING = bufferedReader.readLine()) != null) {
+                            stringBuilder.append(JSON_STRING+"\n");
+                        }
 
 
                     JSONObject jsonObject = new JSONObject(String.valueOf(stringBuilder));
@@ -230,7 +192,7 @@ public class Contact extends AppCompatActivity {
 
                         if (jsonArray.getJSONObject(i).getString("ID").equals(userID)) {
                             email = jsonArray.getJSONObject(i).getString("EmailAddress");
-                            mbrStatus = jsonArray.getJSONObject(i).getString("MbrStatus");
+                            mbrStatus = jsonArray.getJSONObject(i).getString("Status");
                             userID = jsonArray.getJSONObject(i).getString("ID");
                             photoID = jsonArray.getJSONObject(i).getString("PhotoID");
                             yearTurnedActive = jsonArray.getJSONObject(i).getString("YearTA");
@@ -238,7 +200,7 @@ public class Contact extends AppCompatActivity {
                             lastName = jsonArray.getJSONObject(i).getString("LastName");
                             spouse = jsonArray.getJSONObject(i).getString("Spouse");
                             StreetAddress = jsonArray.getJSONObject(i).getString("StreetAddress");
-                            CityState = jsonArray.getJSONObject(i).getString("CityState");
+                            CityState = jsonArray.getJSONObject(i).getString("CityAndState");
                             ZipCode = jsonArray.getJSONObject(i).getString("ZipCode");
                             PrimaryContactNumber = jsonArray.getJSONObject(i).getString("PrimNum");
                             SecondaryContactNumber = jsonArray.getJSONObject(i).getString("SecNum");
@@ -248,7 +210,7 @@ public class Contact extends AppCompatActivity {
                             CommitteeTitle = jsonArray.getJSONObject(i).getString("CommitteeTitle");
                             AzaleaGardenTourCommitteesTitle = jsonArray.getJSONObject(i).getString("AzaleaGardenTourCommitteesTitles");
                             AzaleaGardenTourCommittees = jsonArray.getJSONObject(i).getString("AzaleaGardenTourCommittees");
-                            BiographicalInfo = jsonArray.getJSONObject(i).getString("BiographicalInfo");
+                            BiographicalInfo = jsonArray.getJSONObject(i).getString("bioInfo");
 
                             final String finalFirstName = firstName;
                             final String finalLastName = lastName;
@@ -430,23 +392,23 @@ public class Contact extends AppCompatActivity {
 
                                         //----!!!!!!---- Update Date begins ----!!!!!!----
                                         //no action is attached to this update, so add it within an onclicklistener
-                                        String url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/update.php";
-
-                                        List<NameValuePair> params = new ArrayList<NameValuePair>();
-                                        params.add(new BasicNameValuePair("userID", userID));
-                                        params.add(new BasicNameValuePair("userID", finalEmail));
-                                        params.add(new BasicNameValuePair("spouse", finalSpouse));
-                                        params.add(new BasicNameValuePair("streetAddress", finalStreetAddress));
-                                        params.add(new BasicNameValuePair("primNum", finalPrimaryContactNumber));
-                                        params.add(new BasicNameValuePair("secNum", finalSecondaryContactNumber));
-
-//                                        app will crash once you uncomment this: PROBLEM WITH THE URL or PARAMS?????
-                                        String resultServer = null;
-                                        try {
-                                            resultServer = getHttpPost(url, params);
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
+//                                        String url = "http://capefeargardenclub.org/cfgcTestingJSON/update.php";
+//
+//                                        List<NameValuePair> params = new ArrayList<NameValuePair>();
+//                                        params.add(new BasicNameValuePair("userID", userID));
+//                                        params.add(new BasicNameValuePair("userID", finalEmail));
+//                                        params.add(new BasicNameValuePair("spouse", finalSpouse));
+//                                        params.add(new BasicNameValuePair("streetAddress", finalStreetAddress));
+//                                        params.add(new BasicNameValuePair("primNum", finalPrimaryContactNumber));
+//                                        params.add(new BasicNameValuePair("secNum", finalSecondaryContactNumber));
+//
+////                                        app will crash once you uncomment this: PROBLEM WITH THE URL or PARAMS?????
+//                                        String resultServer = null;
+//                                        try {
+//                                            resultServer = getHttpPost(url, params);
+//                                        } catch (InterruptedException e) {
+//                                            e.printStackTrace();
+//                                        }
 
                                         // !!!!!!!!!!!!! UPDATE ENDS !!!!!!!!!!!!!!!
 
@@ -707,19 +669,18 @@ public class Contact extends AppCompatActivity {
                     }
                     bufferedReader.close();
                     inputStream.close();
-                    httpURLConnection.disconnect();
-                    SBString = stringBuilder.toString().trim();
-                    return SBString;
+                    return stringBuilder.toString().trim();
 
-                } catch (MalformedURLException e) {
+                }
+            } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }
 
+            }
             return null;
         }
 
@@ -731,14 +692,8 @@ public class Contact extends AppCompatActivity {
 //            final EditText txtDate = (EditText)findViewById(R.id.txtDate);
 //            final EditText txtTime = (EditText)findViewById(R.id.txtTime);
 
-            //Dialog
-            final AlertDialog.Builder ad = new AlertDialog.Builder(getApplicationContext());
 
-            ad.setTitle("Error! ");
-            ad.setIcon(android.R.drawable.btn_star_big_on);
-            ad.setPositiveButton("Close", null);
-
-            String url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/update.php";
+            String url = "http://capefeargardenclub.org/cfgcTestingJSON/update.php";
             params.add(new BasicNameValuePair("userID", uID));
             params.add(new BasicNameValuePair("email", email));
             params.add(new BasicNameValuePair("firstName", fName));
@@ -773,13 +728,13 @@ public class Contact extends AppCompatActivity {
             {
 //                ad.setMessage(strMessage);
 //                ad.show();
-                Toast.makeText(Contact.this, "Update not successful", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Contact.this, "Edit not successful", Toast.LENGTH_SHORT).show();
 
                 return false;
             }
             else
             {
-                Toast.makeText(Contact.this, "Update Data Successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Contact.this, "Edit successful", Toast.LENGTH_SHORT).show();
             }
 
             return true;
@@ -826,8 +781,8 @@ public class Contact extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            json_post = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/get_json_info.php";
-            json_get = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/more_json.php";
+
+            json_url = "http://capefeargardenclub.org/cfgcTestingJSON/login.php";
 
         }
 

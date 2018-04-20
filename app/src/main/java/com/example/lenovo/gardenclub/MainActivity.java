@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -34,6 +48,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 //from github/gardenclub-android>git add .
 //...github/gardenclub-android>git commit -m "add existing files
@@ -52,7 +68,7 @@ import java.net.URLEncoder;
 
 public class MainActivity extends AppCompatActivity {
     EditText UsernameEt, PasswordEt;
-    Button Login;
+    Button submit;
     static String JSON_STRING;
     static String json_string;
     private static final String TAG = "MainActivity";
@@ -61,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     int jsonParsed = 0;
     Intent intent;
     int i = 0;
+    StringBuilder str;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,29 +87,36 @@ public class MainActivity extends AppCompatActivity {
         mWebView = findViewById(R.id.webview);
         intent = new Intent(this, ContactList.class);
 //        getSupportActionBar().hide();
-        Login = findViewById(R.id.button);
+        submit = findViewById(R.id.button);
         UsernameEt = findViewById(R.id.et_login);
         PasswordEt = findViewById(R.id.et_pass);
 
 //        Login.setVisibility(View.GONE);
 //        UsernameEt.setVisibility(View.GONE);
 //        PasswordEt.setVisibility(View.GONE);
+//
+//        username = UsernameEt.getText().toString();
+//        password = PasswordEt.getText().toString();
+        username = "bakere@uncw.edu";
+        password = "6!4es2Nl#TCvF!yq)Wjn4#(k";
 
-        username = UsernameEt.getText().toString();
-        password = PasswordEt.getText().toString();
-
-        mWebView.setVisibility(View.GONE);
 
 
-        Login.setOnClickListener(new View.OnClickListener() {
+//        mWebView.setVisibility(View.INVISIBLE);
+
+
+
+        submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mWebView.setVisibility(View.VISIBLE);
+                i++;
                 WebSettings webSettings = mWebView.getSettings();
                 webSettings.setJavaScriptEnabled(true);
                 final WebAppInterface webAppInterface = new WebAppInterface(MainActivity.this);
                 mWebView.addJavascriptInterface(webAppInterface, "Android");
-                Log.d(TAG, "onPostCreate: starts");
+
+                Log.d(TAG, "onClick: starts");
+
                 mWebView.setWebViewClient(new WebViewClient() {
                     @Override
                     public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -111,10 +135,12 @@ public class MainActivity extends AppCompatActivity {
 //                    Log.e(TAG, "onPageFinished: sdasd ", e);
 //                }
 
-                        username = "bakere@uncw.edu";
-                        password = "6!4es2Nl#TCvF!yq)Wjn4#(k";
 
-                        if (view.getOriginalUrl().equals("http://www.capefeargardenclub.org/wp-login.php?redirect_to=%2f") && (i == 0 || i == 5)) {
+                        Log.d(TAG, "onPageFinished: view: " + view);
+                        Log.d(TAG, "onPageFinished: view.getUrl(): " + view.getUrl());
+
+                        if (view.getUrl().equals("http://www.capefeargardenclub.org/wp-login.php?redirect_to=%2f")) {
+                            Log.d(TAG, "onPageFinished: url equals haha");
                             StringBuilder sb = new StringBuilder();
 //                sb.append("window.onload = function(){");
                             sb.append("var objPWD = '" + password + "';objAccount  = '" + username + "';var str = '';");
@@ -139,54 +165,40 @@ public class MainActivity extends AppCompatActivity {
                             Log.d(TAG, "onPageFinished: sb: " + sb);
                             view.loadUrl("javascript:" + sb.toString());
                             i++;
-
-
-//                    sb = new StringBuilder();
-//                    Log.d(TAG, "onPageFinished: new string builder");
-//                    sb.append("document.getElementsByTagName('form')[0].onsubmit = function () {");
-//                    sb.append("var objPWD, objAccount;var str = '';");
-//                    sb.append("var inputs = document.getElementsByTagName('input');");
-//                    sb.append("for (var i = 0; i < inputs.length; i++) {");
-//                    sb.append("if (inputs[i].name.toLowerCase() === 'pwd') {objPWD = inputs[i];}");
-//                    sb.append("else if (inputs[i].name.toLowerCase() === 'log') {objAccount = inputs[i];}");
-//                    sb.append("}");
-//                    sb.append("if (objAccount != null) {str += objAccount.value;}");
-////                sb.append("if (objPWD != null) { str += ' , ' + objPWD.value;}");
-//                    sb.append("window.Android.processHTML(str);");
-//                    sb.append("return true;");
-//                    sb.append("};");
-//                    view.loadUrl("javascript:" + sb.toString());
-
                         }
 
+                        Log.d(TAG, "onPageFinished: view.getUrl(): " + view.getUrl());
 
-
-
-                        if (view.getUrl().equals("http://www.capefeargardenclub.org/")) {
+                        String viewURL = view.getUrl();
+                        Log.d(TAG, "onPageFinished: viewURL: " + viewURL);
+                        Log.d(TAG, "onPageFinished: url: " + url);
+                        if (viewURL != null && viewURL.equals("http://www.capefeargardenclub.org/")) {
                             Log.d(TAG, "onPageFinished: Success: view.getUrl() = " + view.getUrl());
                             mWebView.setVisibility(View.GONE);
-                            parseJson(view);
-//                    Login.performClick();
-//                    parseJson(view);
+                            String method = "some_json";
+//                                PostData(username, password, method);
+                            try {
+                                parseJson(view);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                             if (json_string != null) {
                                 Log.d(TAG, "onPageFinished: json_string != null");
                                 intent.putExtra("json_data", json_string);
                                 Log.d(TAG, "onPageFinished: json_String =  " + json_string);
-//                                Log.d(TAG, "onPageFinished: loginInfo = " + webAppInterface.loginInfo);
-//                                intent.putExtra("login_email", webAppInterface.loginInfo);
                                 intent.putExtra("login_email", username);
+                                intent.putExtra("password", password);
                                 startActivity(intent);
                                 finish();
 
                             } else {
                                 Log.d(TAG, "onPageFinished: json_string == null / jsonParsed = " + jsonParsed);
-                                parseJson(view);
+                                try {
+                                    parseJson(view);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
                             }
-//                        mWebView.reload();
-//                    if (json_string == null) {
-//                        Toast.makeText(getApplicationContext(), "First Get JSON", Toast.LENGTH_LONG).show();
-//
-//                    }
                         } else  {
                             Log.d(TAG, "onPageFinished: view.getUrl() = " + view.getUrl());
                         }
@@ -199,10 +211,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-
-                String type = "login";
-
-                parseJson(v);
+                try {
+                    parseJson(v);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 //                BackgroundWorker backgroundWorker = new BackgroundWorker(MainActivity.this);
 //                backgroundWorker.execute(type, username, password);
 
@@ -217,42 +230,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        //enable javascript
-
-
-        //catch events
-
-
-
-
     }
 
-    private String buildInjection() throws IOException {
-        Log.d(TAG, "buildInjection: called");
-        StringBuilder buf = new StringBuilder();
-        InputStream inject = getAssets().open("get_user_info.js");// file from assets
-        BufferedReader in = new BufferedReader(new InputStreamReader(inject, "UTF-8"));
-        String str;
-        while ((str = in.readLine()) != null) {
-            buf.append(str);
-        }
-        in.close();
-        Log.d(TAG, "buildInjection: in: " + in);
-        Log.d(TAG, "buildInjection: buf: " + buf);
-        return buf.toString();
-    }
-
-    public void getJSON(View view) {
+    public void getJSON(View view) throws InterruptedException {
         new BackgroundTask().execute();
         parseJson(view);
 
     }
 
-    public void parseJson(View view) {
+    public void parseJson(View view) throws InterruptedException {
         new BackgroundTask().execute();
+//        PostData(username, password, "some_json");
         if (json_string == null) {
             Log.d(TAG, "parseJson: json_string == null");
-            Toast.makeText(getApplicationContext(), "First Get JSON", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Loading...", Toast.LENGTH_LONG).show();
 
         } else {
             Log.d(TAG, "parseJson: json_string != null");
@@ -270,35 +261,65 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Void... voids) {
+            HttpClient client = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost(json_url);
+            str = new StringBuilder();
+            String url = "http://capefeargardenclub.org/cfgcTestingJSON/login.php";
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+            params.add(new BasicNameValuePair("email", username));
+            params.add(new BasicNameValuePair("password", password));
+            params.add(new BasicNameValuePair("method", "some_json"));
             try {
-//                String username = params[1];
-//                String password = params[2];
-                URL url = new URL(json_url);
-                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-                InputStream inputStream = httpURLConnection.getInputStream();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
-                StringBuilder stringBuilder = new StringBuilder();
-                while ((JSON_STRING = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(JSON_STRING+"\n");
+                httpPost.setEntity(new UrlEncodedFormEntity(params));
+                //problem starts here
+                HttpResponse response = client.execute(httpPost);
+                StatusLine statusLine = response.getStatusLine();
+                int statusCode = statusLine.getStatusCode();
+                if (statusCode == 200) { // Status OK
+                    HttpEntity entity = response.getEntity();
+                    InputStream inputStream = entity.getContent();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
+                    StringBuilder stringBuilder = new StringBuilder();
+                    while ((JSON_STRING = bufferedReader.readLine()) != null) {
+                        stringBuilder.append(JSON_STRING+"\n");
+                    }
+
+                    bufferedReader.close();
+                    inputStream.close();
+                    return stringBuilder.toString().trim();
+                } else {
+                    Log.e("Log", "Failed to download result..");
                 }
-//                json_string = stringBuilder.toString();
-
-                bufferedReader.close();
-                inputStream.close();
-                httpURLConnection.disconnect();
-                return stringBuilder.toString().trim();
-
-            } catch (MalformedURLException e) {
+                Log.d(TAG, "run: str: " + str);
+            } catch (ClientProtocolException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+
+//                URL url = new URL(json_url);
+//                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+//                InputStream inputStream = httpURLConnection.getInputStream();
+//                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
+//                StringBuilder stringBuilder = new StringBuilder();
+//                while ((JSON_STRING = bufferedReader.readLine()) != null) {
+//                    stringBuilder.append(JSON_STRING+"\n");
+//                }
+////                json_string = stringBuilder.toString();
+//
+//                bufferedReader.close();
+//                inputStream.close();
+//                httpURLConnection.disconnect();
+//                return stringBuilder.toString().trim();
+
             return null;
         }
 
         @Override
         protected void onPreExecute() {
-            json_url = "http://satoshi.cis.uncw.edu/~jbr5433/GardenClub/get_json_data.php";
+            json_url = "http://capefeargardenclub.org/cfgcTestingJSON/login.php";
 
         }
 
@@ -310,9 +331,90 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             json_string = result;
-            Log.d(TAG, "onPostExecute: json_string: " + json_string.toString());
+            Log.d(TAG, "onPostExecute: json_string: " + json_string);
 
         }
+    }
+
+    public boolean PostData(String email, String password, String method) throws InterruptedException {
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+        //FIX THIS HERE
+        String url = "http://capefeargardenclub.org/cfgcTestingJSON/login.php";
+        params.add(new BasicNameValuePair("email", email));
+        params.add(new BasicNameValuePair("password", password));
+        params.add(new BasicNameValuePair("method", method));
+
+        String resultServer  = getHttpPost(url,params);
+        Log.d(TAG, "resultServer - updateData: " + resultServer);
+
+        /*** Default Value ***/
+        String strStatusID = "0";
+        String strMessage = "Unknown Status!";
+
+        JSONObject c;
+        try {
+            c = new JSONObject(resultServer);
+            strStatusID = c.getString("StatusID");
+            Log.d(TAG, "PostData: connected to resultServer");
+            strMessage = c.getString("Message");
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            Log.d(TAG, "PostData: not connected");
+            e.printStackTrace();
+        }
+
+        // Prepare Save Data
+        if(strStatusID.equals("0")) {
+//                ad.setMessage(strMessage);
+//                ad.show();
+            Toast.makeText(MainActivity.this, "Update not successful", Toast.LENGTH_SHORT).show();
+
+            return false;
+        } else {
+            Toast.makeText(MainActivity.this, "Update Data Successfully", Toast.LENGTH_SHORT).show();
+        }
+        return true;
+    }
+
+    public String getHttpPost(String strUrl, final List<NameValuePair> params) throws InterruptedException {
+        final String url = strUrl;
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                HttpClient client = new DefaultHttpClient();
+                HttpPost httpPost = new HttpPost(url);
+                str = new StringBuilder();
+                try {
+                    httpPost.setEntity(new UrlEncodedFormEntity(params));
+                    //problem starts here
+                    HttpResponse response = client.execute(httpPost);
+                    StatusLine statusLine = response.getStatusLine();
+                    int statusCode = statusLine.getStatusCode();
+                    if (statusCode == 200) { // Status OK
+                        HttpEntity entity = response.getEntity();
+                        InputStream content = entity.getContent();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            str.append(line);
+                        }
+                    } else {
+                        Log.e("Log", "Failed to download result..");
+                    }
+                    Log.d(TAG, "run: str: " + str);
+                } catch (ClientProtocolException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+        thread.join();
+        Log.d(TAG, "getHttpPost: str: " + str);
+        return str.toString();
     }
 
 }
