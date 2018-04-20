@@ -25,29 +25,28 @@
 
     <EditText
         android:id="@+id/et_login"
-        android:layout_width="wrap_content"
+        android:layout_width="256dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:autofillHints="Username"
         android:contentDescription="Username or Email"
         android:ems="10"
-        android:hint="Username"
+        android:hint="Enter email here"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView5"/>
 
     <EditText
         android:id="@+id/et_pass"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:contentDescription="Password"
         android:ems="10"
-        android:hint="Password"
+        android:hint="Enter password here"
         android:inputType="textPassword"
+        app:layout_constraintEnd_toEndOf="@+id/et_login"
         app:layout_constraintStart_toStartOf="@+id/et_login"
         app:layout_constraintTop_toBottomOf="@+id/et_login"/>
 
@@ -78,15 +77,33 @@
 
     <WebView
         android:id="@+id/webview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="0dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Email"
+        android:textSize="18sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/et_login"
+        app:layout_constraintEnd_toStartOf="@+id/et_login"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Password"
+        android:textSize="18sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/et_pass"
+        app:layout_constraintEnd_toStartOf="@+id/et_pass"
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

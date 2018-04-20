@@ -59,45 +59,148 @@ public class MainActivity extends AppCompatActivity {
     WebView mWebView;
     String password, username;
     int jsonParsed = 0;
-     Intent intent;
+    Intent intent;
+    int i = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        intent = new Intent(this, ContactList.class);
+
         setContentView(R.layout.activity_main);
+        mWebView = findViewById(R.id.webview);
+        intent = new Intent(this, ContactList.class);
 //        getSupportActionBar().hide();
         Login = findViewById(R.id.button);
         UsernameEt = findViewById(R.id.et_login);
         PasswordEt = findViewById(R.id.et_pass);
 
-        Login.setVisibility(View.GONE);
-        UsernameEt.setVisibility(View.GONE);
-        PasswordEt.setVisibility(View.GONE);
+//        Login.setVisibility(View.GONE);
+//        UsernameEt.setVisibility(View.GONE);
+//        PasswordEt.setVisibility(View.GONE);
 
         username = UsernameEt.getText().toString();
         password = PasswordEt.getText().toString();
 
+        mWebView.setVisibility(View.GONE);
+
+
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String type = "login";
+//                mWebView.setVisibility(View.VISIBLE);
+                WebSettings webSettings = mWebView.getSettings();
+                webSettings.setJavaScriptEnabled(true);
+                final WebAppInterface webAppInterface = new WebAppInterface(MainActivity.this);
+                mWebView.addJavascriptInterface(webAppInterface, "Android");
+                Log.d(TAG, "onPostCreate: starts");
+                mWebView.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                        Log.d(TAG, "shouldOverrideUrlLoading: called");
+                        view.loadUrl(url);
+                        return true;
+                    }
 
-//                StringBuilder sb = new StringBuilder();
-////                sb.append("document.getElementsByTagName('form')[0].onsubmit = function () {");
-//                sb.append("var login = function () {");
-//                sb.append("var objPWD = " + password + ";objAccount  = " + username + ";var str = '';");
-//                sb.append("var inputs = document.getElementsByTagName('input');");
-//                sb.append("for (var i = 0; i < inputs.length; i++) {");
-//                sb.append("if (inputs[i].name.toLowerCase() === 'pwd') {inputs[i].value = " + password + ";}");
-//                sb.append("else if (inputs[i].name.toLowerCase() === 'log') {inputs[i].value = " + username + ";}");
-//                sb.append("}");
-//                sb.append("if (objAccount != null) {str += objAccount.value;}");
-////                sb.append("if (objPWD != null) { str += ' , ' + objPWD.value;}");
-//                sb.append("window.Android.processHTML(str);");
+                    @Override
+                    public void onPageFinished(WebView view, String url) {
+                        Log.d(TAG, "onPageFinished: called");
+//                try {
+//                    view.loadUrl("javascript:" + buildInjection());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    Log.e(TAG, "onPageFinished: sdasd ", e);
+//                }
+
+                        username = "bakere@uncw.edu";
+                        password = "6!4es2Nl#TCvF!yq)Wjn4#(k";
+
+                        if (view.getOriginalUrl().equals("http://www.capefeargardenclub.org/wp-login.php?redirect_to=%2f") && (i == 0 || i == 5)) {
+                            StringBuilder sb = new StringBuilder();
+//                sb.append("window.onload = function(){");
+                            sb.append("var objPWD = '" + password + "';objAccount  = '" + username + "';var str = '';");
+                            sb.append("var inputs = document.getElementsByTagName('input');");
+                            sb.append("for (var i = 0; i < inputs.length; i++) {");
+                            sb.append("if (inputs[i].name.toLowerCase() === 'pwd') {inputs[i].value = '" + password.toString() + "';}");
+                            sb.append("else if (inputs[i].name.toLowerCase() === 'log') {inputs[i].value = '" + username + "';}");
+                            sb.append("}");
+                            sb.append("if (objAccount != null) {str += objAccount.value;}");
+                            sb.append("console.log('a');");
+                            sb.append("if (objPWD != null) { str += ' , ' + objPWD.value;}");
+                            sb.append("console.log('b');");
+                            sb.append("console.log('c');");
+//                    sb.append("window.Android.processHTML(str);");
+                            sb.append("console.log('d');");
+                            sb.append("document.getElementById('loginform').submit();");
 //                sb.append("return true;");
 //                sb.append("};");
-////                webview.loadUrl("javascript:" + sb.toString());
+                            sb.append("console.log('e');");
+//                sb.append("login();");
+                            sb.append("console.log('f');");
+                            Log.d(TAG, "onPageFinished: sb: " + sb);
+                            view.loadUrl("javascript:" + sb.toString());
+                            i++;
+
+
+//                    sb = new StringBuilder();
+//                    Log.d(TAG, "onPageFinished: new string builder");
+//                    sb.append("document.getElementsByTagName('form')[0].onsubmit = function () {");
+//                    sb.append("var objPWD, objAccount;var str = '';");
+//                    sb.append("var inputs = document.getElementsByTagName('input');");
+//                    sb.append("for (var i = 0; i < inputs.length; i++) {");
+//                    sb.append("if (inputs[i].name.toLowerCase() === 'pwd') {objPWD = inputs[i];}");
+//                    sb.append("else if (inputs[i].name.toLowerCase() === 'log') {objAccount = inputs[i];}");
+//                    sb.append("}");
+//                    sb.append("if (objAccount != null) {str += objAccount.value;}");
+////                sb.append("if (objPWD != null) { str += ' , ' + objPWD.value;}");
+//                    sb.append("window.Android.processHTML(str);");
+//                    sb.append("return true;");
+//                    sb.append("};");
+//                    view.loadUrl("javascript:" + sb.toString());
+
+                        }
+
+
+
+
+                        if (view.getUrl().equals("http://www.capefeargardenclub.org/")) {
+                            Log.d(TAG, "onPageFinished: Success: view.getUrl() = " + view.getUrl());
+                            mWebView.setVisibility(View.GONE);
+                            parseJson(view);
+//                    Login.performClick();
+//                    parseJson(view);
+                            if (json_string != null) {
+                                Log.d(TAG, "onPageFinished: json_string != null");
+                                intent.putExtra("json_data", json_string);
+                                Log.d(TAG, "onPageFinished: json_String =  " + json_string);
+//                                Log.d(TAG, "onPageFinished: loginInfo = " + webAppInterface.loginInfo);
+//                                intent.putExtra("login_email", webAppInterface.loginInfo);
+                                intent.putExtra("login_email", username);
+                                startActivity(intent);
+                                finish();
+
+                            } else {
+                                Log.d(TAG, "onPageFinished: json_string == null / jsonParsed = " + jsonParsed);
+                                parseJson(view);
+                            }
+//                        mWebView.reload();
+//                    if (json_string == null) {
+//                        Toast.makeText(getApplicationContext(), "First Get JSON", Toast.LENGTH_LONG).show();
+//
+//                    }
+                        } else  {
+                            Log.d(TAG, "onPageFinished: view.getUrl() = " + view.getUrl());
+                        }
+                    }
+                });
+
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        mWebView.loadUrl("http://www.capefeargardenclub.org/wp-login.php?redirect_to=%2f");
+                    }
+                });
+
+
+                String type = "login";
 
                 parseJson(v);
 //                BackgroundWorker backgroundWorker = new BackgroundWorker(MainActivity.this);
@@ -115,83 +218,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         //enable javascript
-        mWebView = findViewById(R.id.webview);
-        WebSettings webSettings = mWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        final WebAppInterface webAppInterface = new WebAppInterface(this);
-        mWebView.addJavascriptInterface(webAppInterface, "Android");
+
 
         //catch events
-        mWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                Log.d(TAG, "shouldOverrideUrlLoading: called");
-                view.loadUrl(url);
-                return true;
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                Log.d(TAG, "onPageFinished: called");
-//                try {
-//                    view.loadUrl("javascript:" + buildInjection());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    Log.e(TAG, "onPageFinished: sdasd ", e);
-//                }
-                StringBuilder sb = new StringBuilder();
-                sb.append("document.getElementsByTagName('form')[0].onsubmit = function () {");
-                sb.append("var objPWD, objAccount;var str = '';");
-                sb.append("var inputs = document.getElementsByTagName('input');");
-                sb.append("for (var i = 0; i < inputs.length; i++) {");
-                sb.append("if (inputs[i].name.toLowerCase() === 'pwd') {objPWD = inputs[i];}");
-                sb.append("else if (inputs[i].name.toLowerCase() === 'log') {objAccount = inputs[i];}");
-                sb.append("}");
-                sb.append("if (objAccount != null) {str += objAccount.value;}");
-//                sb.append("if (objPWD != null) { str += ' , ' + objPWD.value;}");
-                sb.append("window.Android.processHTML(str);");
-                sb.append("return true;");
-                sb.append("};");
-                view.loadUrl("javascript:" + sb.toString());
-
-                if (view.getUrl().equals("http://www.capefeargardenclub.org/")) {
-                    Log.d(TAG, "onPageFinished: view.getUrl() = " + view.getUrl());
-                    mWebView.setVisibility(View.GONE);
-                    parseJson(view);
-//                    Login.performClick();
-//                    parseJson(view);
-                    if (json_string != null) {
-                        Log.d(TAG, "onPageFinished: json_string != null");
-                        intent.putExtra("json_data", json_string);
-                        Log.d(TAG, "onPageFinished: json_String =  " + json_string);
-                        Log.d(TAG, "onPageFinished: loginInfo = " + webAppInterface.loginInfo);
-                        intent.putExtra("login_email", webAppInterface.loginInfo);
-                        startActivity(intent);
-                        finish();
-
-                    } else {
-                        Log.d(TAG, "onPageFinished: json_string == null / jsonParsed = " + jsonParsed);
-                        parseJson(view);
-                        mWebView.reload();
 
 
-                    }
-//                    if (json_string == null) {
-//                        Toast.makeText(getApplicationContext(), "First Get JSON", Toast.LENGTH_LONG).show();
-//
-//                    }
-                } else  {
-                    Log.d(TAG, "onPageFinished: view.getUrl() = " + view.getUrl());
-                }
-            }
-        });
 
-        MainActivity.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mWebView.loadUrl("http://www.capefeargardenclub.org/wp-login.php?redirect_to=%2f");
-            }
-        });
 
     }
 

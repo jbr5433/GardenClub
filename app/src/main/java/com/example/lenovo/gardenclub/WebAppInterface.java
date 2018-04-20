@@ -34,5 +34,4 @@ class WebAppInterface {
         return formData;
     }
 
-
 }
