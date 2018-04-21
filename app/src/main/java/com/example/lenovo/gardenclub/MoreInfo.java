@@ -63,13 +63,11 @@ public class MoreInfo extends AppCompatActivity {
         final TextView tvYTA = findViewById(R.id.tv_yta);
         final TextView tvBio = findViewById(R.id.tv_bio);
         TextView tvBack = findViewById(R.id.tvBack);
+        tvYTA.setText(YTA);
 
-        if (tvYTA != null) {
-            tvYTA.setText(YTA);
-        }
 
         if (loginEmail.equals(userEmail)) {
-            if (tvBio != null || bio.length() > 0) {
+            if (bio != null || bio != "null") {
                 tvBio.setText(bio);
             } else {
                 tvBio.setText(R.string.userNoBio);
@@ -143,10 +141,11 @@ public class MoreInfo extends AppCompatActivity {
             tvBio.setOnClickListener(editFields);
             tvYTA.setOnClickListener(editFields);
         } else {
-            if (tvBio != null || bio.length() > 0) {
-                tvBio.setText(bio);
-            } else {
+            if (bio.equals("null") || bio == null) {
                 tvBio.setText(firstName + " has not added a bio yet.");
+                Log.d(TAG, "onCreate: its " + bio.length());
+            } else {
+                tvBio.setText(bio);
             }
         }
 

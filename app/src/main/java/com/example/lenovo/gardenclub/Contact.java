@@ -42,6 +42,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -226,8 +227,6 @@ public class Contact extends AppCompatActivity {
 
                             final String finalYearTurnedActive = yearTurnedActive;
 
-
-
                             btnEmail = findViewById(R.id.btn_email);
                             btnCall = findViewById(R.id.btn_call);
                             btnText = findViewById(R.id.btn_text);
@@ -243,6 +242,22 @@ public class Contact extends AppCompatActivity {
                                     secondaryContactTV.setText(finalSecondaryContactNumber);
                                     emailTV.setText(finalEmail);
                                     if (finalEmail.equals(loginEmail)) {
+                                        if (nameTV == null || nameTV.getText() == "null") {
+                                            nameTV.setText("No name is set, tap here to set one.");
+                                        }
+                                        if (spouseTV == null || spouseTV.getText() == "null") {
+                                            spouseTV.setText("No spouse name is set, tap here to set one.");
+                                        }
+                                        if (addressTV == null || addressTV.getText() == "null") {
+                                            addressTV.setText("No address is set, tap here to set one.");
+                                        }
+                                        if (primaryContactTV == null || primaryContactTV.getText() == "null") {
+                                            primaryContactTV.setText("No primary contact is set, tap here to set one.");
+                                        }
+                                        if (secondaryContactTV == null || secondaryContactTV.getText() == "null") {
+                                            secondaryContactTV.setText("No secondary contact is set, tap here to set one.");
+                                        }
+
                                         final TextView tvEdit = findViewById(R.id.tv_edit);
                                         tvEdit.setText("Edit");
 
@@ -729,14 +744,12 @@ public class Contact extends AppCompatActivity {
 //                ad.setMessage(strMessage);
 //                ad.show();
                 Toast.makeText(Contact.this, "Edit not successful", Toast.LENGTH_SHORT).show();
-
                 return false;
             }
             else
             {
                 Toast.makeText(Contact.this, "Edit successful", Toast.LENGTH_SHORT).show();
             }
-
             return true;
         }
 
@@ -781,9 +794,7 @@ public class Contact extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-
             json_url = "http://capefeargardenclub.org/cfgcTestingJSON/login.php";
-
         }
 
         @Override

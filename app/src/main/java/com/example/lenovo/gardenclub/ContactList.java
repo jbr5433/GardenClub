@@ -3,6 +3,7 @@ package com.example.lenovo.gardenclub;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -82,6 +83,8 @@ public class ContactList extends AppCompatActivity {
         loginEmail = getIntent().getExtras().getString("login_email").trim();
         intent.putExtra("json_data", json_string);
 
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         try {
 
             mJSONObject = new JSONObject(json_string);
@@ -117,7 +120,8 @@ public class ContactList extends AppCompatActivity {
 //        lst.setOnItemClickListener(mOnItemClickListener);
     }
 
-//    AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
+
+    //    AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
 //        @Override
 //        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 //            try {
@@ -139,11 +143,13 @@ public class ContactList extends AppCompatActivity {
 //        }
 //    };
 
+
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu_search, menu);
         MenuItem menuItem = menu.findItem(R.id.search_badge_ID);
         SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setMaxWidth(Integer.MAX_VALUE);
 
 //        additional features
         searchView.setActivated(true);
