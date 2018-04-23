@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Parcelable;
@@ -87,6 +89,8 @@ public class Contact extends AppCompatActivity {
         getSupportActionBar().hide();
         tvMoreInfo = findViewById(R.id.tv_more_info);
         tvBack = findViewById(R.id.tv_back);
+
+
         new BackgroundTask1().execute("get_info", userID);
     }
 
@@ -227,13 +231,30 @@ public class Contact extends AppCompatActivity {
                                     secondaryContactTV.setText(finalSecondaryContactNumber);
                                     emailTV.setText(finalEmail);
                                     int p_id = 0;
-                                    Log.d(TAG, "run: photo_id: " + finalPhotoID);
-                                    Resources resources;
-                                    resources = getResources();
-                                    p_id = getResources().getIdentifier("p" + finalPhotoID, "drawable", getPackageName());
-                                    imageView.setImageDrawable(resources.getDrawable(p_id));
+
+
+                                    InputStream is = null;
+
+                                    if (finalPhotoID != null && finalPhotoID != "null") {
+                                        try {
+                                            is = getApplicationContext().getAssets().open("pics/p" + finalPhotoID + ".jpg");
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                        imageView.setImageBitmap(BitmapFactory.decodeStream(is));
+                                    }
+
+
+
+//                                    Log.d(TAG, "run: photo_id: " + finalPhotoID);
+//                                    String newPID = "p" + finalPhotoID;
+//                                    Log.d(TAG, "run: newPID: " + newPID);
+//                                    Resources resources;
+//                                    resources = getResources();
+
+
 //                                    imageView.setImageResource(p_id);
-                                    Log.d(TAG, "run: p_id: " + p_id);
+
 
                                     if (finalEmail.equals(loginEmail)) {
                                         if (nameTV == null || nameTV.getText() == "null") {

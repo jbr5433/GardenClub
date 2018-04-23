@@ -114,14 +114,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onPageFinished(WebView view, String url) {
                         Log.d(TAG, "onPageFinished: called");
-//                try {
-//                    view.loadUrl("javascript:" + buildInjection());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    Log.e(TAG, "onPageFinished: sdasd ", e);
-//                }
-
-
                         Log.d(TAG, "onPageFinished: view: " + view);
                         Log.d(TAG, "onPageFinished: view.getUrl(): " + view.getUrl());
 

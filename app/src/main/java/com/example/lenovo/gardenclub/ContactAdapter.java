@@ -91,8 +91,8 @@ public class ContactAdapter extends ArrayAdapter implements Filterable {
             row = layoutInflater.inflate(R.layout.row_layout_1, parent, false);
             contactHolder = new ContactHolder();
             contactHolder.tx_name = row.findViewById(R.id.nameTV);
-            contactHolder.tx_email = row.findViewById(R.id.tx_email);
-            contactHolder.tx_mobile = row.findViewById(R.id.tx_mobile);
+//            contactHolder.tx_email = row.findViewById(R.id.tx_email);
+//            contactHolder.tx_mobile = row.findViewById(R.id.tx_mobile);
             contactHolder.tx_mbrstatus = row.findViewById(R.id.tv_mbrstatus);
             row.setTag(contactHolder);
 

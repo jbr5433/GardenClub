@@ -72,7 +72,7 @@ public class ContactList extends AppCompatActivity {
 
 
         JSONObject JO;
-        mContactAdapter = new ContactAdapter(this, R.layout.row_layout);
+        mContactAdapter = new ContactAdapter(this, R.layout.row_layout_1);
         lst = findViewById(R.id.ListView);
 
         lst.setAdapter(mContactAdapter);

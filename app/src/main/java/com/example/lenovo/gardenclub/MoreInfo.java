@@ -95,7 +95,6 @@ public class MoreInfo extends AppCompatActivity {
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
-                                Toast.makeText(getApplicationContext(), "userID: " + userID + "; loginEmail: " + loginEmail + "; udBio: " +udBio, Toast.LENGTH_LONG).show();
 
                             }
                             if (viewId_placeholder == tvYTAId) {
