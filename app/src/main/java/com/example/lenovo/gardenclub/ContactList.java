@@ -74,7 +74,6 @@ public class ContactList extends AppCompatActivity {
         JSONObject JO;
         mContactAdapter = new ContactAdapter(this, R.layout.row_layout);
         lst = findViewById(R.id.ListView);
-//        CustomListView customListView = new CustomListView(this, names, imgid);
 
         lst.setAdapter(mContactAdapter);
         lst.setTextFilterEnabled(true);

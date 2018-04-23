@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Parcelable;
@@ -16,6 +17,7 @@ import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,30 +78,15 @@ public class Contact extends AppCompatActivity {
         Intent intent = new Intent(this, Contact.class);
         intent.getExtras();
         setContentView(R.layout.activity_contact);
-//        json = getIntent().getExtras().getString("json_object");
         userID = getIntent().getExtras().getString("user_id");
         loginEmail = getIntent().getExtras().getString("login_email");
         password = getIntent().getExtras().getString("password");
-//        bio = getIntent().getExtras().getString("bio");
-//        Log.d(TAG, "Contact.java onCreate: bio: " + bio);
         String json_data = getIntent().getExtras().getString("json_data");
-//        Log.d(TAG, "onCreate: json_data: " + json_data); == null
         backIntent = new Intent(this, ContactList.class);
         backIntent.putExtra("json_data", json_data);
         getSupportActionBar().hide();
         tvMoreInfo = findViewById(R.id.tv_more_info);
         tvBack = findViewById(R.id.tv_back);
-
-//        try {
-////            jsonObject = new JSONObject(json);
-//
-////            Toast.makeText(getApplicationContext(), jsonObject.getString("userID"), Toast.LENGTH_SHORT).show();
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-
-
-        //            userID = jsonObject.getString("userID");
         new BackgroundTask1().execute("get_info", userID);
     }
 
@@ -112,11 +99,8 @@ public class Contact extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-//        backIntent.putExtra("json_data", json_string);
         backIntent.putExtra("login_email", loginEmail);
-//        if (json_string != null) {
             startActivity(backIntent);
-//        }
 
     }
 
@@ -140,7 +124,6 @@ public class Contact extends AppCompatActivity {
                 postParams.add(new BasicNameValuePair("method", "all_json"));
                 try {
                     httpPost.setEntity(new UrlEncodedFormEntity(postParams));
-                    //problem starts here
                     HttpResponse response = client.execute(httpPost);
                     StatusLine statusLine = response.getStatusLine();
                     int statusCode = statusLine.getStatusCode();
@@ -186,6 +169,7 @@ public class Contact extends AppCompatActivity {
                     final TextView primaryContactTV = (TextView) findViewById(R.id.primaryContactTV);
                     final TextView secondaryContactTV = (TextView) findViewById(R.id.secondaryContactTV);
                     final TextView emailTV = (TextView) findViewById(R.id.emailTV);
+                    final ImageView imageView = findViewById(R.id.imageView2);
                     int isUser = 0;
 
                     for (int i = 0; i <= jsonArray.length(); i++) {
@@ -231,6 +215,7 @@ public class Contact extends AppCompatActivity {
                             btnCall = findViewById(R.id.btn_call);
                             btnText = findViewById(R.id.btn_text);
 
+                            final String finalPhotoID = photoID;
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -241,6 +226,15 @@ public class Contact extends AppCompatActivity {
                                     primaryContactTV.setText(finalPrimaryContactNumber);
                                     secondaryContactTV.setText(finalSecondaryContactNumber);
                                     emailTV.setText(finalEmail);
+                                    int p_id = 0;
+                                    Log.d(TAG, "run: photo_id: " + finalPhotoID);
+                                    Resources resources;
+                                    resources = getResources();
+                                    p_id = getResources().getIdentifier("p" + finalPhotoID, "drawable", getPackageName());
+                                    imageView.setImageDrawable(resources.getDrawable(p_id));
+//                                    imageView.setImageResource(p_id);
+                                    Log.d(TAG, "run: p_id: " + p_id);
+
                                     if (finalEmail.equals(loginEmail)) {
                                         if (nameTV == null || nameTV.getText() == "null") {
                                             nameTV.setText("No name is set, tap here to set one.");
@@ -279,10 +273,6 @@ public class Contact extends AppCompatActivity {
                                                 .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialogInterface, int i) {
-                                                        //this will update the data
-                                                        //gets the id of the textview
-                                                        //viewId_placeholder is set to the id of the textview that is clicked
-                                                        //so each if statement says "if this was the textview that had been clicked, do this: "
                                                         if (viewId_placeholder == spouseId) {
                                                             spouseTV.setText(etGen.getText());
                                                             udSpouse = etGen.getText().toString();
@@ -312,8 +302,7 @@ public class Contact extends AppCompatActivity {
                                                             } catch (InterruptedException e) {
                                                                 e.printStackTrace();
                                                             }
-                                                            Toast.makeText(getApplicationContext(), "udFN: " + udFN + "; udLN: " + udLN + "; udSpouse: " +udSpouse + "; udCAS: " +udCAS + "; udPrim: " +
-                                                                    udPrim + "; udSec: " +udSec+ "; udZip: " + udZip, Toast.LENGTH_LONG).show();
+
                                                         }
                                                         if (viewId_placeholder == primId) {
                                                             primaryContactTV.setText(etGen.getText());
@@ -344,8 +333,7 @@ public class Contact extends AppCompatActivity {
                                                             } catch (InterruptedException e) {
                                                                 e.printStackTrace();
                                                             }
-                                                            Toast.makeText(getApplicationContext(), "udFN: " + udFN + "; udLN: " + udLN + "; udSpouse: " +udSpouse + "; udCAS: " +udCAS + "; udPrim: " +
-                                                                    udPrim + "; udSec: " +udSec+ "; udZip: " + udZip, Toast.LENGTH_LONG).show();
+
                                                         }
                                                         if (viewId_placeholder == secId) {
                                                             secondaryContactTV.setText(etGen.getText());
@@ -376,19 +364,9 @@ public class Contact extends AppCompatActivity {
                                                             } catch (InterruptedException e) {
                                                                 e.printStackTrace();
                                                             }
-                                                            Toast.makeText(getApplicationContext(), "udFN: " + udFN + "; udLN: " + udLN + "; udSpouse: " +udSpouse + "; udCAS: " +udCAS + "; udPrim: " +
-                                                                            udPrim + "; udSec: " +udSec+ "; udZip: " + udZip, Toast.LENGTH_LONG).show();
 
 
                                                         }
-//                                                        String postFN = firstName;
-//                                                        String postLN = nameTV.getText().toString();
-//                                                        String postFN = nameTV.getText().toString();
-//                                                        String postFN = nameTV.getText().toString();
-//                                                        String postFN = nameTV.getText().toString();
-//                                                        String postFN = nameTV.getText().toString();
-//                                                        String postFN = nameTV.getText().toString();
-//                                                        SaveData();
 
                                                     }
                                                 })
@@ -403,49 +381,12 @@ public class Contact extends AppCompatActivity {
 
                                         alertDialog = builder.create();
 
-                                        //set all the edit texts and buttons
-
-                                        //----!!!!!!---- Update Date begins ----!!!!!!----
-                                        //no action is attached to this update, so add it within an onclicklistener
-//                                        String url = "http://capefeargardenclub.org/cfgcTestingJSON/update.php";
-//
-//                                        List<NameValuePair> params = new ArrayList<NameValuePair>();
-//                                        params.add(new BasicNameValuePair("userID", userID));
-//                                        params.add(new BasicNameValuePair("userID", finalEmail));
-//                                        params.add(new BasicNameValuePair("spouse", finalSpouse));
-//                                        params.add(new BasicNameValuePair("streetAddress", finalStreetAddress));
-//                                        params.add(new BasicNameValuePair("primNum", finalPrimaryContactNumber));
-//                                        params.add(new BasicNameValuePair("secNum", finalSecondaryContactNumber));
-//
-////                                        app will crash once you uncomment this: PROBLEM WITH THE URL or PARAMS?????
-//                                        String resultServer = null;
-//                                        try {
-//                                            resultServer = getHttpPost(url, params);
-//                                        } catch (InterruptedException e) {
-//                                            e.printStackTrace();
-//                                        }
-
-                                        // !!!!!!!!!!!!! UPDATE ENDS !!!!!!!!!!!!!!!
-
-//                                        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "SAVE TEXT", new DialogInterface.OnClickListener() {
-//                                            @Override
-//                                            public void onClick(DialogInterface dialogInterface, int i) {
-////                                                textView.setText(editText.getText());
-//                                            }
-//                                        });
-
                                         tvEdit.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
                                                 Toast.makeText(getApplicationContext(), "Tap the fields you wish to change", Toast.LENGTH_LONG).show();
                                             }
                                         });
-
-                                        //all other textviews.setOnCliCkListener(editFields);
-
-                                        //updated variables
-
-
                                         final AlertDialog finalGenAD = alertDialog;
                                         View.OnClickListener editFields = new View.OnClickListener() {
                                             @Override
@@ -491,8 +432,7 @@ public class Contact extends AppCompatActivity {
                                                                     e.printStackTrace();
                                                                 }
                                                                 nameTV.setText(udFN.concat(" " + udLN));
-                                                                Toast.makeText(getApplicationContext(), "udFN: " + udFN + "; udLN: " + udLN + "; udSpouse: " +udSpouse + "; udCAS: " +udCAS + "; udPrim: " +
-                                                                        udPrim + "; udSec: " +udSec+ "; udZip: " + udZip, Toast.LENGTH_LONG).show();
+
                                                             }})
                                                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                                             @Override
@@ -564,8 +504,7 @@ public class Contact extends AppCompatActivity {
                                                                         e.printStackTrace();
                                                                     }
                                                                     addressTV.setText(udAddress.concat("\n" + udCAS + ", " + " " + udZip));
-                                                                    Toast.makeText(getApplicationContext(), "udFN: " + udFN + "; udLN: " + udLN + "; udSpouse: " +udSpouse + "; udCAS: " +udCAS + "; udPrim: " +
-                                                                            udPrim + "; udSec: " +udSec+ "; udZip: " + udZip, Toast.LENGTH_LONG).show();
+
                                                                 }})
                                                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                                                 @Override

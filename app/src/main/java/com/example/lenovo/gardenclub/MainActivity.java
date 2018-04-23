@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         mWebView = findViewById(R.id.webview);
         intent = new Intent(this, ContactList.class);
@@ -90,25 +89,12 @@ public class MainActivity extends AppCompatActivity {
         submit = findViewById(R.id.button);
         UsernameEt = findViewById(R.id.et_login);
         PasswordEt = findViewById(R.id.et_pass);
-
-//        Login.setVisibility(View.GONE);
-//        UsernameEt.setVisibility(View.GONE);
-//        PasswordEt.setVisibility(View.GONE);
-//
-//        username = UsernameEt.getText().toString();
-//        password = PasswordEt.getText().toString();
-        username = "bakere@uncw.edu";
-        password = "6!4es2Nl#TCvF!yq)Wjn4#(k";
-
-
-
-//        mWebView.setVisibility(View.INVISIBLE);
-
-
-
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                username = UsernameEt.getText().toString();
+                password = PasswordEt.getText().toString();
+//                mWebView.setVisibility(View.VISIBLE);
                 i++;
                 WebSettings webSettings = mWebView.getSettings();
                 webSettings.setJavaScriptEnabled(true);
@@ -201,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         } else  {
                             Log.d(TAG, "onPageFinished: view.getUrl() = " + view.getUrl());
+                            Toast.makeText(getApplicationContext(), "Email or password is incorrect. Please try again.", Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -216,12 +203,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-//                BackgroundWorker backgroundWorker = new BackgroundWorker(MainActivity.this);
-//                backgroundWorker.execute(type, username, password);
-
-//                Intent intent = new Intent(MainActivity.this, ContactList.class);
-//                startActivity(intent);
-     //           Login.setText("test");
 
             }
         });
@@ -240,7 +221,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void parseJson(View view) throws InterruptedException {
         new BackgroundTask().execute();
-//        PostData(username, password, "some_json");
         if (json_string == null) {
             Log.d(TAG, "parseJson: json_string == null");
             Toast.makeText(getApplicationContext(), "Loading...", Toast.LENGTH_LONG).show();
@@ -297,23 +277,6 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
-//                URL url = new URL(json_url);
-//                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-//                InputStream inputStream = httpURLConnection.getInputStream();
-//                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
-//                StringBuilder stringBuilder = new StringBuilder();
-//                while ((JSON_STRING = bufferedReader.readLine()) != null) {
-//                    stringBuilder.append(JSON_STRING+"\n");
-//                }
-////                json_string = stringBuilder.toString();
-//
-//                bufferedReader.close();
-//                inputStream.close();
-//                httpURLConnection.disconnect();
-//                return stringBuilder.toString().trim();
-
             return null;
         }
 
@@ -366,8 +329,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Prepare Save Data
         if(strStatusID.equals("0")) {
-//                ad.setMessage(strMessage);
-//                ad.show();
+
             Toast.makeText(MainActivity.this, "Update not successful", Toast.LENGTH_SHORT).show();
 
             return false;
@@ -387,7 +349,6 @@ public class MainActivity extends AppCompatActivity {
                 str = new StringBuilder();
                 try {
                     httpPost.setEntity(new UrlEncodedFormEntity(params));
-                    //problem starts here
                     HttpResponse response = client.execute(httpPost);
                     StatusLine statusLine = response.getStatusLine();
                     int statusCode = statusLine.getStatusCode();
